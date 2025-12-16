@@ -20,6 +20,8 @@ class Business extends Model {
         'user_id'
     ];
 
+    protected $table = 'business';
+
     public function user()
     {
         return $this->belongsTo(User::class);
