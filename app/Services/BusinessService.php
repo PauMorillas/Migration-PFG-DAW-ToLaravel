@@ -1,26 +1,37 @@
-<?php 
+<?php
 namespace App\Services;
 
+use Bus;
 use App\Models\Business;
+use App\Repositories\Contracts\BusinessRepositoryInterface;
 
-    class BusinessService {
-        public static function findById($id){
-            return Business::findOrFail($id);
-        }
-        
-        public static function create($data){
-            return Business::create($data);
-        }
+class BusinessService
+{
+    private BusinessRepositoryInterface $repository;
 
-        public static function update($id, $data){
-            $business = Business::findOrFail($id);
-            $business->update($data);
-            return $business;
-        }
-
-        public static function delete($id){
-            $business = Business::findOrFail($id); // Si falla, lanza una excepción 404 automáticamente 
-            $business->delete();
-            return true; // Por lo que podemos asumir que si llega aqui es porque se eliminó con exito
-        }
+    public function __construct(BusinessRepositoryInterface $repository)
+    {
+        $this->repository = $repository;
     }
+
+    public function findById($id)
+    {
+        return $this->repository->findById($id);
+    }
+
+    public function create($data)
+    {
+        return $this->repository->create($data);
+    }
+
+    public function update($id, $data)
+    {
+        return $this->repository->update($id,$data);
+    }
+
+    public function delete($id)
+    {
+        $this->repository->delete($id);
+        return true;
+    }
+}

@@ -1,0 +1,31 @@
+<?php
+namespace App\Repositories\Eloquent;
+
+use App\Models\Business;
+use App\Repositories\Contracts\BusinessRepositoryInterface;
+
+class BusinessRepository implements BusinessRepositoryInterface
+{
+    public function findById($id): Business
+    {
+        return Business::findOrFail($id);
+    }
+
+    public function create($data): Business
+    {
+        return Business::create($data);
+    }
+
+    public function update($id, $data): Business
+    {
+        $business = Business::findOrFail($id);
+        $business->update($data);
+        return $business;
+    }
+
+    public function delete(int $id): void
+    {
+        $business = Business::findOrFail($id);
+        $business->delete();
+    }
+}

@@ -12,11 +12,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 // TODO: Revisar los trycatch de errores 500
 class BusinessController extends Controller
 {
+    private BusinessService $businessService;
+
+    public function __construct(BusinessService $businessService) {
+        $this->businessService = $businessService;
+    }
     
     public function findById(int $id): JsonResponse
     {
         try {
-            $business = BusinessService::findById($id);
+            $business = $this->businessService->findById($id);
         } catch (\Throwable $th) {
             return response()->json(['error' => 'Negocio no encontrado'], 404);
         }
@@ -28,7 +33,7 @@ class BusinessController extends Controller
     {
         try {
             $this->validateBusiness($request);
-            BusinessService::create($request->all());
+            $this->businessService->create($request->all());
 
         } catch (ValidationException $ex) {
             return response()->json(['error' => $ex->validator->errors()->first()], 400);
@@ -44,7 +49,7 @@ class BusinessController extends Controller
     {
         try {
             $this->validateBusiness($request);
-            $business = BusinessService::update($id, $request->all());
+            $business = $this->businessService->update($id, $request->all());
         } catch (ValidationException $ex) {
             return response()->json(['error' => $ex->validator->errors()->first()], 400);
         } catch (\Throwable $th) {
@@ -60,7 +65,7 @@ class BusinessController extends Controller
     public function delete(int $id): JsonResponse
     {
         try {
-            BusinessService::delete($id);
+            $this->businessService->delete($id);
         } catch (\Throwable $th) {
             return response()->json([
                 'error' => $th->getMessage()

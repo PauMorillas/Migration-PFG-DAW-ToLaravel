@@ -9,7 +9,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create(
-            'business',
+            'businesses',
             function (Blueprint $table) {
                 // El -> se usa para acceder a métodos y propiedades de un objeto en PHP
                 $table->id(); // Crea una columna id (BIGINT, autoincremental, clave primaria)
@@ -32,6 +32,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('business');
+        Schema::dropIfExists('businesses');
     }
 };
