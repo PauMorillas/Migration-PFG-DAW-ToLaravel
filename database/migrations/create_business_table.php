@@ -22,7 +22,8 @@ return new class extends Migration {
                 // TODO: QUITAR NULLABLE CUANDO SE ASIGNE LA RELACIÓN
                 $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
 
-                // AÑADIR ESTO
+                // Simplicita que se creen las columnas created_at, updated_at y delted_at
+                // OBLIGATORIO SI EL MODELO USA SOFTDELETES
                 $table->timestamps();
                 $table->softDeletes();
             }

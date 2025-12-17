@@ -10,7 +10,6 @@ class Business extends Model {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'id',
         'name',
         'email',
         'phone',
