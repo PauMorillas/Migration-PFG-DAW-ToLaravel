@@ -3,11 +3,13 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\Service;
+use Illuminate\Database\Eloquent\Collection;
 
 interface ServiceRepositoryInterface
 {
-    public function findById(int $id): Service;
+    public function findAll(int $id): Collection;
+    public function findById(int $id, $serviceId): Service;
     public function create(array $data): Service;
-    public function update(int $id, array $data): Service;
-    public function delete(int $id): void;
+    public function update(Service $service, array $data): Service;
+    public function delete(Service $service): void;
 }

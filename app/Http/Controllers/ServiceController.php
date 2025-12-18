@@ -18,10 +18,22 @@ class ServiceController extends Controller
         $this->serviceService = $serviceService;
     }
 
-    public function findById(int $id): JsonResponse
+    public function findAll(int $id): JsonResponse {
+        try {
+            $servicios = $this->serviceService->findAll($id);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ], 500);
+        }
+
+        return response()->json([$servicios], 200);
+    }
+
+    public function findById(int $id, int $serviceId): JsonResponse
     {
         try {
-            $service = $this->serviceService->findById($id);
+            $service = $this->serviceService->findById($id, $serviceId);
         } catch (\Throwable $th) {
             return response()->json(['error' => 'Negocio no encontrado'], 404);
         }
@@ -29,11 +41,11 @@ class ServiceController extends Controller
         return response()->json([$service], 200);
     }
 
-    public function create(Request $request): JsonResponse
+    public function create(int $id, Request $request): JsonResponse
     {
         try {
             $this->validateService($request);
-            $this->serviceService->create($request->all());
+            $this->serviceService->create($id, $request->all());
 
         } catch (ValidationException $ex) {
             return response()->json(['error' => $ex->validator->errors()->first()], 400);
@@ -45,6 +57,8 @@ class ServiceController extends Controller
 
         return response()->json(['created' => true], 201);
     }
+
+    // TODO: Resto de CRUD
 
     private function validateService(Request $request)
     {
