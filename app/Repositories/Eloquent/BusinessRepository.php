@@ -16,16 +16,14 @@ class BusinessRepository implements BusinessRepositoryInterface
         return Business::create($data);
     }
 
-    public function update($id, $data): Business
+    public function update($business, $data): Business
     {
-        $business = Business::findOrFail($id);
         $business->update($data);
         return $business;
     }
 
-    public function delete(int $id): void
+    public function delete(Business $business): void
     {
-        $business = Business::findOrFail($id);
         $business->delete();
     }
 }

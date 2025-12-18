@@ -18,7 +18,7 @@ Route::prefix('businesses')->group(function () {
         ->whereNumber('id');
 
     // === Rutas de servicios (1-N Desde negocio) ===
-    Route::get('{id}/services', [ServiceController::class, 'findAll']); // TODO IMPLEMENTAR EL METODO EN EL SERVICE Y CONTROLLER
+    Route::get('{id}/services', [ServiceController::class, 'findAll']);
     Route::get('{id}/services/{serviceId}' , [ServiceController::class, 'findById'])
     ->whereNumber('id');
 
