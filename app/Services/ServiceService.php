@@ -27,7 +27,7 @@ class ServiceService {
         return $this->serviceRepository->findById($id, $serviceId);
     }
 
-    public function create(int $id, array $data){
+    public function create(int $id, array $data): Service{
         // REGLA DE NEGOCIO, para crear un servicio se debe tener primero un negocio asociado
         $business = $this->businessRepository->findById($id);
         $data['business_id'] = $business->id; // TODO: Preguntar si es correcto asociar el id con el de parámetro en este punto
@@ -35,13 +35,17 @@ class ServiceService {
         return $this->serviceRepository->create($data);
     }
 
-   /*  public function update($id, $data): Service{
+      public function update(int $id, int $serviceId, array $data): Service{
+        unset($data['business_id']); // No se debe permitir actualizar el negocio
+        $service = $this->serviceRepository->findById($id, $serviceId);
 
-        return $this->serviceRepository->update($id, $data);
+        return $this->serviceRepository->update($service, $data);
     }
 
-    public function delete($id){
-        $this->serviceRepository->delete($id);
+    public function delete(int $id, int $serviceId): bool{
+        $service = $this->serviceRepository->findById($id, $serviceId);
+        $this->serviceRepository->delete($service);
+        
         return true;
-    } */
+    }
 }

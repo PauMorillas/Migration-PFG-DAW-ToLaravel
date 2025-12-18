@@ -58,7 +58,35 @@ class ServiceController extends Controller
         return response()->json(['created' => true], 201);
     }
 
-    // TODO: Resto de CRUD
+    public function update(int $id, int $serviceId, Request $request): JsonResponse
+    {
+        try {
+            $this->validateService($request);
+            $service = $this->serviceService->update($id, $serviceId, $request->all());
+
+        } catch (ValidationException $ex) {
+            return response()->json(['error' => $ex->validator->errors()->first()], 400);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ], 500);
+        }
+
+        return response()->json($service, 201);
+    }
+
+    public function delete(int $id, int $serviceId): JsonResponse
+    {
+        try {
+            $this->serviceService->delete($id, $serviceId);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ], 500);
+        }
+
+        return response()->json('', 204);
+    }
 
     private function validateService(Request $request)
     {
