@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Throwable;
 use Illuminate\Http\Request;
 use App\Services\ServiceService;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 // TODO: Revisar los trycatch de errores 500
 class ServiceController extends Controller
 {
+    use ApiResponseTrait;
     private readonly ServiceService $serviceService;
 
     public function __construct(ServiceService $serviceService)
@@ -19,31 +23,33 @@ class ServiceController extends Controller
         $this->serviceService = $serviceService;
     }
 
-    public function findAll(int $id): JsonResponse {
+    public function findAll(int $id): JsonResponse
+    {
         try {
             $servicios = $this->serviceService->findAll($id);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ], 500);
+            return $this->ok($servicios);
+        } catch (ModelNotFoundException $th) {
+            return $this->notFound('Negocio no encontrado');
+        } catch (Throwable $th) {
+            return $this->internalError($th);
         }
-
-        return response()->json([$servicios], 200);
     }
 
     public function findById(int $id, int $serviceId): JsonResponse
     {
         try {
             $service = $this->serviceService->findById($id, $serviceId);
-             return response()->json([$service], 200);
-        } catch (ValidationException|BadRequestException $th) {
-            return response()->json(['error' => $th->getMessage()], 400);
-        } catch (\Throwable $th) {
-            captureException($th);
-            return response()->json(['error' => 'Negocio no encontrado'], 500);
+            return $this->ok([$service]);
+        } catch (ValidationException $th) {
+            return $this->validationError($th->validator->errors()->first());
+        } catch (Throwable $th) {
+            return $this->internalError($th);
         }
 
-       
+        /* catch (ValidationException | BadRequestException $th) {
+            return response()->json(['error' => $th->getMessage()], 400);
+        } */
+
     }
 
     public function create(int $id, Request $request): JsonResponse
@@ -51,16 +57,13 @@ class ServiceController extends Controller
         try {
             $this->validateService($request);
             $this->serviceService->create($id, $request->all());
+            return $this->created();
 
-        } catch (ValidationException $ex) {
-            return response()->json(['error' => $ex->validator->errors()->first()], 400);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ], 500);
+        } catch (ValidationException $th) {
+            return $this->validationError($th->validator->errors()->first());
+        } catch (Throwable $th) {
+            return $this->internalError($th);
         }
-
-        return response()->json(['created' => true], 201);
     }
 
     public function update(int $id, int $serviceId, Request $request): JsonResponse
@@ -69,28 +72,22 @@ class ServiceController extends Controller
             $this->validateService($request);
             $service = $this->serviceService->update($id, $serviceId, $request->all());
 
-        } catch (ValidationException $ex) {
-            return response()->json(['error' => $ex->validator->errors()->first()], 400);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ], 500);
+            return $this->ok([$service]);
+        } catch (ValidationException $th) {
+            return $this->validationError($th->validator->errors()->first());
+        } catch (Throwable $th) {
+            return $this->internalError($th);
         }
-
-        return response()->json($service, 201);
     }
 
     public function delete(int $id, int $serviceId): JsonResponse
     {
         try {
             $this->serviceService->delete($id, $serviceId);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ], 500);
+            return $this->noContent();
+        } catch (Throwable $th) {
+            return $this->internalError($th);
         }
-
-        return response()->json('', 204);
     }
 
     private function validateService(Request $request)
