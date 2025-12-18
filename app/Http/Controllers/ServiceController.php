@@ -7,11 +7,12 @@ use App\Services\ServiceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 // TODO: Revisar los trycatch de errores 500
 class ServiceController extends Controller
 {
-    private $serviceService;
+    private readonly ServiceService $serviceService;
 
     public function __construct(ServiceService $serviceService)
     {
@@ -34,11 +35,15 @@ class ServiceController extends Controller
     {
         try {
             $service = $this->serviceService->findById($id, $serviceId);
+             return response()->json([$service], 200);
+        } catch (ValidationException|BadRequestException $th) {
+            return response()->json(['error' => $th->getMessage()], 400);
         } catch (\Throwable $th) {
-            return response()->json(['error' => 'Negocio no encontrado'], 404);
+            captureException($th);
+            return response()->json(['error' => 'Negocio no encontrado'], 500);
         }
 
-        return response()->json([$service], 200);
+       
     }
 
     public function create(int $id, Request $request): JsonResponse

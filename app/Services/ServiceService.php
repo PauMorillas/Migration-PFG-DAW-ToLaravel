@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ServiceService {
 
-    private ServiceRepositoryInterface $serviceRepository;
-    private BusinessRepository $businessRepository;
+    private readonly ServiceRepositoryInterface $serviceRepository;
+    private readonly BusinessRepository $businessRepository;
 
     public function __construct(ServiceRepositoryInterface $serviceRepository, BusinessRepository $businessRepository)
     {

@@ -7,7 +7,7 @@ use App\Repositories\Contracts\BusinessRepositoryInterface;
 
 class BusinessService
 {
-    private BusinessRepositoryInterface $repository;
+    private readonly BusinessRepositoryInterface $repository;
 
     public function __construct(BusinessRepositoryInterface $repository)
     {

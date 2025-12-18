@@ -1,32 +1,39 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\Business;
+use Throwable;
 use Illuminate\Http\Request;
+use App\Traits\ApiResponseTrait;
 use App\Services\BusinessService;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 // TODO: Revisar los trycatch de errores 500
 class BusinessController extends Controller
 {
-    private BusinessService $businessService;
+    private readonly BusinessService $businessService;
 
-    public function __construct(BusinessService $businessService) {
+    use ApiResponseTrait;
+
+    public function __construct(BusinessService $businessService)
+    {
         $this->businessService = $businessService;
     }
-    
+
     public function findById(int $id): JsonResponse
     {
         try {
             $business = $this->businessService->findById($id);
-        } catch (\Throwable $th) {
-            return response()->json(['error' => 'Negocio no encontrado'], 404);
-        }
 
-        return response()->json([$business], 200);
+            return $this->ok([$business]);
+        } catch (ModelNotFoundException $th) {
+            return $this->notFound('Negocio no encontrado');
+        } catch (Throwable $th) {
+            return $this->internalError($th);
+        }
     }
 
     public function create(Request $request): JsonResponse
@@ -35,14 +42,12 @@ class BusinessController extends Controller
             $this->validateBusiness($request);
             $this->businessService->create($request->all());
 
+            return $this->created();
         } catch (ValidationException $ex) {
-            return response()->json(['error' => $ex->validator->errors()->first()], 400);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ], 500);
+            return $this->validationError($ex->validator->errors()->first());
+        } catch (Throwable $th) {
+            return $this->internalError($th);
         }
-        return response()->json(['created' => true], 201);
     }
 
     public function update(int $id, Request $request): JsonResponse
@@ -50,15 +55,13 @@ class BusinessController extends Controller
         try {
             $this->validateBusiness($request);
             $business = $this->businessService->update($id, $request->all());
-        } catch (ValidationException $ex) {
-            return response()->json(['error' => $ex->validator->errors()->first()], 400);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ], 500);
-        }
 
-        return response()->json([$business], 200);
+            return $this->ok([$business]);
+        } catch (ValidationException $ex) {
+            return $this->validationError($ex->validator->errors()->first());
+        } catch (Throwable $th) {
+            return $this->internalError($th);
+        }
     }
 
     // Hace un soft delete
@@ -66,13 +69,10 @@ class BusinessController extends Controller
     {
         try {
             $this->businessService->delete($id);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ], 500);
+            return $this->noContent();
+        } catch (Throwable $th) {
+            return $this->internalError($th);
         }
-
-        return response()->json(['deleted' => true], 204); // TODO: Preguntar si es correcto devolver un deleted true
     }
 
     private function validateBusiness(Request $request): array
