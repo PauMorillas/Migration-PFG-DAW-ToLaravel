@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\Service\CreateServiceDTO;
-use App\Exceptions\AppException;
-use DomainException;
 use Throwable;
 use Illuminate\Http\Request;
+use App\Exceptions\AppException;
 use App\Services\ServiceService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
+use App\DTO\Service\CreateServiceDTO;
+use App\DTO\Service\UpdateServiceDTO;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 // TODO: Revisar los trycatch de errores 500
 class ServiceController extends Controller
@@ -31,8 +30,8 @@ class ServiceController extends Controller
         try {
             $servicios = $this->serviceService->findAll($id);
             return $this->ok($servicios);
-        } catch (ModelNotFoundException $th) {
-            return $this->notFound('Negocio no encontrado');
+        } catch (AppException $th) {
+            return $this->notFound($th->getMessage());
         } catch (Throwable $th) {
             return $this->internalError($th);
         }
@@ -43,8 +42,8 @@ class ServiceController extends Controller
         try {
             $service = $this->serviceService->findById($id, $serviceId);
             return $this->ok([$service]);
-        } catch (ModelNotFoundException $th) {
-            return $this->notFound('Negocio no encontrado');
+        } catch (AppException $th) {
+            return $this->notFound($th->getMessage());
         } catch (ValidationException $th) {
             return $this->validationError($th->validator->errors()->first());
         } catch (Throwable $th) {
@@ -63,7 +62,7 @@ class ServiceController extends Controller
             $this->validateService($request);
             $dto = CreateServiceDTO::createFromArray($request->all(), $businessId);
             $service = $this->serviceService->create($dto);
-            
+
             return $this->created($service);
         } catch (AppException $th) {
             return $this->notFound($th->getMessage());
@@ -78,11 +77,12 @@ class ServiceController extends Controller
     {
         try {
             $this->validateService($request);
-            $service = $this->serviceService->update($id, $serviceId, $request->all());
+            $dto = UpdateServiceDTO::createFromArray($request->all(), $id, $serviceId);
+            $service = $this->serviceService->update($dto);
 
             return $this->ok([$service]);
-        } catch (ModelNotFoundException $th) {
-            return $this->notFound('Negocio no encontrado');
+        } catch (AppException $th) {
+            return $this->notFound($th->getMessage());
         } catch (ValidationException $th) {
             return $this->validationError($th->validator->errors()->first());
         } catch (Throwable $th) {
