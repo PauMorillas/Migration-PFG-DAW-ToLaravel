@@ -38,7 +38,8 @@ trait ApiResponseTrait
     }
 
     /**
-     * Manejo centralizado del 500, Si el APP_DEBUG está activo se muestran los detalles del error
+     * Manejo centralizado del 500, Si el APP_DEBUG está activo
+     *  se muestran los detalles del error
      */
     protected function internalError(Throwable $exception): JsonResponse
     {

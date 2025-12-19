@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\DTO\Service\CreateServiceDTO;
+use App\Exceptions\AppException;
+use DomainException;
 use Throwable;
 use Illuminate\Http\Request;
 use App\Services\ServiceService;
@@ -63,8 +65,8 @@ class ServiceController extends Controller
             $service = $this->serviceService->create($dto);
             
             return $this->created($service);
-        } catch (ModelNotFoundException $th) {
-            return $this->notFound('Negocio no encontrado');
+        } catch (AppException $th) {
+            return $this->notFound($th->getMessage());
         } catch (ValidationException $th) {
             return $this->validationError($th->validator->errors()->first());
         } catch (Throwable $th) {
