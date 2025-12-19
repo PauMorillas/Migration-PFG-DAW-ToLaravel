@@ -52,11 +52,11 @@ class ServiceController extends Controller
 
     }
 
-    public function create(int $id, Request $request): JsonResponse
+    public function create(int $businessId, Request $request): JsonResponse
     {
         try {
             $this->validateService($request);
-            $this->serviceService->create($id, $request->all());
+            $this->serviceService->create($businessId, $request->all());
             return $this->created();
 
         } catch (ValidationException $th) {

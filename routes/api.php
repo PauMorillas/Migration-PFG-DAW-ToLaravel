@@ -21,8 +21,8 @@ Route::prefix('businesses')->group(function () {
     Route::get('{id}/services', [ServiceController::class, 'findAll']);
     Route::get('{id}/services/{serviceId}' , [ServiceController::class, 'findById'])
     ->whereNumber('id');
-
-    Route::post('{id}/services/', [ServiceController::class, 'create']);
+    // TODO: CAMBIAR NAMING A ASI, PARA SER MÁS EXPLICITO
+    Route::post('{businessId}/services/', [ServiceController::class, 'create']);
 
     Route::put('{id}/services/{serviceId}', [ServiceController::class, 'update'])
         ->whereNumber('id');
@@ -30,3 +30,4 @@ Route::prefix('businesses')->group(function () {
     Route::delete('{id}/services/{serviceId}', [ServiceController::class, 'delete'])
         ->whereNumber('id');
 });
+// TODO: Autenticación con Sanctum, ->middleware('auth:sanctum')

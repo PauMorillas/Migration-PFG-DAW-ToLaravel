@@ -1,11 +1,13 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\DTO\Business\UpdateBusinessDTO;
 use Throwable;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponseTrait;
 use App\Services\BusinessService;
 use Illuminate\Routing\Controller;
+use App\DTO\Business\CreateBusinessDTO;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,10 +25,10 @@ class BusinessController extends Controller
         $this->businessService = $businessService;
     }
 
-    public function findById(int $id): JsonResponse
+    public function findById(int $businessId): JsonResponse
     {
         try {
-            $business = $this->businessService->findById($id);
+            $business = $this->businessService->findById($businessId);
 
             return $this->ok([$business]);
         } catch (ModelNotFoundException $th) {
@@ -40,9 +42,10 @@ class BusinessController extends Controller
     {
         try {
             $this->validateBusiness($request);
-            $this->businessService->create($request->all());
+            $dto = CreateBusinessDTO::createFromArray($request->all());
+            $business = $this->businessService->create($dto); // TODO: Hacer el Response
 
-            return $this->created();
+            return $this->created($business);
         } catch (ValidationException $ex) {
             return $this->validationError($ex->validator->errors()->first());
         } catch (Throwable $th) {
@@ -50,25 +53,29 @@ class BusinessController extends Controller
         }
     }
 
-    public function update(int $id, Request $request): JsonResponse
+    public function update(int $businessId, Request $request): JsonResponse
     {
         try {
             $this->validateBusiness($request);
-            $business = $this->businessService->update($id, $request->all());
+            $dto = UpdateBusinessDTO::createFromArray($request->all(), $businessId);
+            $business = $this->businessService->update($dto);
 
-            return $this->ok([$business]);
+            return $this->ok([$business]); // TODO: Hacer el Response
+            // TODO: hacer excepciones que implementen el trait o las extiendan no lo tengo claro
+        } catch (ModelNotFoundException $th) {
+            return $this->notFound('Negocio no encontrado');
         } catch (ValidationException $ex) {
-            return $this->validationError($ex->validator->errors()->first());
+            return $this->validationError($ex->getMessage());
         } catch (Throwable $th) {
             return $this->internalError($th);
         }
     }
 
     // Hace un soft delete
-    public function delete(int $id): JsonResponse
+    public function delete(int $businessId): JsonResponse
     {
         try {
-            $this->businessService->delete($id);
+            $this->businessService->delete($businessId);
             return $this->noContent();
         } catch (Throwable $th) {
             return $this->internalError($th);

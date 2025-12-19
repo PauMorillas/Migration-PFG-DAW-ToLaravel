@@ -4,37 +4,37 @@ namespace App\Traits;
 
 use Throwable;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 trait ApiResponseTrait
 {
-    protected function ok($data = null, ?int $status = 200): JsonResponse
+    protected function ok($data = null, ?int $status = Response::HTTP_OK): JsonResponse
     {
         return response()->json($data, $status);
     }
-
-    protected function error(?string $message = 'Error interno del Servidor', int $status = 500): JsonResponse
+        protected function error(?string $message = 'Error interno del Servidor', ?int $status = Response::HTTP_INTERNAL_SERVER_ERROR): JsonResponse
     {
         return response()->json(['error' => $message], $status);
     }
 
     protected function validationError(string $message): JsonResponse
     {
-        return $this->error($message, 400);
+        return $this->error($message, Response::HTTP_BAD_REQUEST);
     }
 
     protected function notFound(string $message = 'Recurso no encontrado'): JsonResponse
     {
-        return $this->error($message, 404);
+        return $this->error($message, Response::HTTP_NOT_FOUND);
     }
 
     protected function created($data = null): JsonResponse
     {
-        return $this->ok($data, 201);
+        return $this->ok($data, Response::HTTP_CREATED);
     }
 
     protected function noContent(): JsonResponse
     {
-        return response()->json(null, 204);
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -50,10 +50,10 @@ trait ApiResponseTrait
                 'line'    => $exception->getLine(),
                 // OJO: stack trace solo en local
                 'trace'   => collect($exception->getTrace())->take(5),
-            ], 500);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->error('Error interno del servidor', 500);
+        return $this->error('Error interno del servidor', Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     // Si escala bien hacer el resto:

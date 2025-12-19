@@ -1,6 +1,8 @@
 <?php
 namespace App\Services;
 
+use App\DTO\Business\CreateBusinessDTO;
+use App\DTO\Business\UpdateBusinessDTO;
 use Bus;
 use App\Models\Business;
 use App\Repositories\Contracts\BusinessRepositoryInterface;
@@ -19,16 +21,17 @@ class BusinessService
         return $this->repository->findById($id);
     }
 
-    public function create($data): Business
+    public function create(CreateBusinessDTO $dto): Business
     {
         // TODO: Buscar si existe una sesión o un usuario con ese negocio asociado
-        return $this->repository->create($data);
+        return $this->repository->create($dto->toArray());
     }
 
-    public function update($id, $data): Business
+    public function update(UpdateBusinessDTO $dto): Business
     {
-        $business = $this->repository->findById($id);
-        return $this->repository->update($business,$data);
+        $business = $this->repository->findById($dto->businessId);
+
+        return $this->repository->update($business,$dto->toArray());
     }
 
     public function delete($id): bool
