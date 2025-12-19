@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\Service\CreateServiceDTO;
 use Throwable;
 use Illuminate\Http\Request;
 use App\Services\ServiceService;
@@ -40,6 +41,8 @@ class ServiceController extends Controller
         try {
             $service = $this->serviceService->findById($id, $serviceId);
             return $this->ok([$service]);
+        } catch (ModelNotFoundException $th) {
+            return $this->notFound('Negocio no encontrado');
         } catch (ValidationException $th) {
             return $this->validationError($th->validator->errors()->first());
         } catch (Throwable $th) {
@@ -56,9 +59,12 @@ class ServiceController extends Controller
     {
         try {
             $this->validateService($request);
-            $this->serviceService->create($businessId, $request->all());
-            return $this->created();
-
+            $dto = CreateServiceDTO::createFromArray($request->all(), $businessId);
+            $service = $this->serviceService->create($dto);
+            
+            return $this->created($service);
+        } catch (ModelNotFoundException $th) {
+            return $this->notFound('Negocio no encontrado');
         } catch (ValidationException $th) {
             return $this->validationError($th->validator->errors()->first());
         } catch (Throwable $th) {
@@ -73,6 +79,8 @@ class ServiceController extends Controller
             $service = $this->serviceService->update($id, $serviceId, $request->all());
 
             return $this->ok([$service]);
+        } catch (ModelNotFoundException $th) {
+            return $this->notFound('Negocio no encontrado');
         } catch (ValidationException $th) {
             return $this->validationError($th->validator->errors()->first());
         } catch (Throwable $th) {
@@ -85,6 +93,8 @@ class ServiceController extends Controller
         try {
             $this->serviceService->delete($id, $serviceId);
             return $this->noContent();
+        } catch (ModelNotFoundException $th) {
+            return $this->notFound('Negocio no encontrado');
         } catch (Throwable $th) {
             return $this->internalError($th);
         }
