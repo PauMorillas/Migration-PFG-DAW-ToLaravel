@@ -9,31 +9,30 @@ class ServiceRepository implements ServiceRepositoryInterface
 {
     public function findAll(int $id): Collection
     {
-        return Service::where('business_id', $id)
+        return Service::query()
+        ->where('business_id', $id)
         ->get();
     }
     
-    public function findById(int $id, $serviceId): Service
+    public function findById(int $serviceId): ?Service
     {
-        return Service::where('business_id', $id)
-            ->where('id', $serviceId)
-            ->firstOrFail();
+        return Service::query()->find($serviceId);
     }
 
     public function create(array $data): Service
     {
-        return Service::create($data);
+        return Service::query()->create($data);
     }
 
     public function update(Service $service, array $data): Service
     {
-        $service->update($data);
+        $service->query()->update($data);
 
         return $service;
     }
 
     public function delete(Service $service): void
     {
-        $service->delete();
+        $service->query()->delete();
     }
 }

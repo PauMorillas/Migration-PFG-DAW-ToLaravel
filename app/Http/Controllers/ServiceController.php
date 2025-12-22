@@ -18,12 +18,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class ServiceController extends Controller
 {
     use ApiResponseTrait;
-    private readonly ServiceService $serviceService;
 
-    public function __construct(ServiceService $serviceService)
-    {
-        $this->serviceService = $serviceService;
-    }
+    public function __construct(private readonly ServiceService $serviceService)
+    {}
 
     public function findAll(int $id): JsonResponse
     {
@@ -43,17 +40,12 @@ class ServiceController extends Controller
             $service = $this->serviceService->findById($id, $serviceId);
             return $this->ok([$service]);
         } catch (AppException $th) {
-            return $this->notFound($th->getMessage());
+            return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (ValidationException $th) {
             return $this->validationError($th->validator->errors()->first());
         } catch (Throwable $th) {
             return $this->internalError($th);
         }
-
-        /* catch (ValidationException | BadRequestException $th) {
-            return response()->json(['error' => $th->getMessage()], 400);
-        } */
-
     }
 
     public function create(int $businessId, Request $request): JsonResponse

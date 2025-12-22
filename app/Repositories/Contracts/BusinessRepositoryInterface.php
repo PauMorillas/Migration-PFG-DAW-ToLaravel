@@ -5,7 +5,7 @@ use App\Models\Business;
 
 interface BusinessRepositoryInterface
 {
-    public function findById(int $id): Business;
+    public function findById(int $id): ?Business;
     public function create(array $data): Business;
     public function update(Business $business, $data): Business;
     public function delete(Business $business): void;

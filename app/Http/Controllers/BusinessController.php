@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\DTO\Business\UpdateBusinessDTO;
+use App\Exceptions\AppException;
 use Throwable;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponseTrait;
@@ -16,14 +17,11 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 // TODO: Revisar los trycatch de errores 500
 class BusinessController extends Controller
 {
-    private readonly BusinessService $businessService;
 
     use ApiResponseTrait;
 
-    public function __construct(BusinessService $businessService)
-    {
-        $this->businessService = $businessService;
-    }
+    public function __construct(private readonly BusinessService $businessService)
+    {}
 
     public function findById(int $businessId): JsonResponse
     {
@@ -31,8 +29,8 @@ class BusinessController extends Controller
             $business = $this->businessService->findById($businessId);
 
             return $this->ok([$business]);
-        } catch (ModelNotFoundException $th) {
-            return $this->notFound('Negocio no encontrado');
+        } catch (AppException $th) {
+            return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
             return $this->internalError($th);
         }
@@ -61,11 +59,10 @@ class BusinessController extends Controller
             $business = $this->businessService->update($dto);
 
             return $this->ok([$business]); // TODO: Hacer el Response
-            // TODO: hacer excepciones que implementen el trait o las extiendan no lo tengo claro
-        } catch (ModelNotFoundException $th) {
-            return $this->notFound('Negocio no encontrado');
+        } catch (AppException $th) {
+            return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (ValidationException $ex) {
-            return $this->validationError($ex->getMessage());
+            return $this->validationError($ex->validator->errors()->first());
         } catch (Throwable $th) {
             return $this->internalError($th);
         }
@@ -77,6 +74,8 @@ class BusinessController extends Controller
         try {
             $this->businessService->delete($businessId);
             return $this->noContent();
+        } catch (AppException $th) {
+            return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
             return $this->internalError($th);
         }

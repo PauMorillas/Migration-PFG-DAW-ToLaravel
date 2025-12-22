@@ -1,44 +1,50 @@
 <?php
 namespace App\Services;
 
-use App\DTO\Business\CreateBusinessDTO;
-use App\DTO\Business\UpdateBusinessDTO;
 use Bus;
 use App\Models\Business;
+use App\DTO\Business\CreateBusinessDTO;
+use App\DTO\Business\UpdateBusinessDTO;
+use App\Exceptions\BusinessNotFoundException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Repositories\Contracts\BusinessRepositoryInterface;
 
 class BusinessService
 {
-    private readonly BusinessRepositoryInterface $repository;
 
-    public function __construct(BusinessRepositoryInterface $repository)
-    {
-        $this->repository = $repository;
-    }
+    public function __construct(
+    private readonly BusinessRepositoryInterface $businessRepository)
+    {}
 
     public function findById($id): Business
     {
-        return $this->repository->findById($id);
+        $entity = $this->businessRepository->findById($id);
+
+        if (is_null($entity)) {
+            throw new BusinessNotFoundException();
+        }
+
+        return $entity;
     }
 
     public function create(CreateBusinessDTO $dto): Business
     {
         // TODO: Buscar si existe una sesión o un usuario con ese negocio asociado
-        return $this->repository->create($dto->toArray());
+        return $this->businessRepository->create($dto->toArray());
     }
 
     public function update(UpdateBusinessDTO $dto): Business
     {
-        $business = $this->repository->findById($dto->businessId);
+        $business = $this->findById($dto->businessId);
 
-        return $this->repository->update($business,$dto->toArray());
+        return $this->businessRepository->update($business, $dto->toArray());
     }
 
     public function delete($id): bool
     {
-        $business = $this->repository->findById($id);
+        $business = $this->findById($id);
 
-        $this->repository->delete($business);
+        $this->businessRepository->delete($business);
         return true;
     }
 }
