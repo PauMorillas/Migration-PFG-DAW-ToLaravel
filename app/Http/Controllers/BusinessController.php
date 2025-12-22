@@ -12,7 +12,6 @@ use App\DTO\Business\CreateBusinessDTO;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 // TODO: Revisar los trycatch de errores 500
 class BusinessController extends Controller

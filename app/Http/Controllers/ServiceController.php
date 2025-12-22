@@ -12,7 +12,6 @@ use App\DTO\Service\CreateServiceDTO;
 use App\DTO\Service\UpdateServiceDTO;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 // TODO: Revisar los trycatch de errores 500
 class ServiceController extends Controller
@@ -20,7 +19,8 @@ class ServiceController extends Controller
     use ApiResponseTrait;
 
     public function __construct(private readonly ServiceService $serviceService)
-    {}
+    {
+    }
 
     public function findAll(int $id): JsonResponse
     {
@@ -28,7 +28,7 @@ class ServiceController extends Controller
             $servicios = $this->serviceService->findAll($id);
             return $this->ok($servicios);
         } catch (AppException $th) {
-            return $this->notFound($th->getMessage());
+            return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
             return $this->internalError($th);
         }
@@ -57,7 +57,7 @@ class ServiceController extends Controller
 
             return $this->created($service);
         } catch (AppException $th) {
-            return $this->notFound($th->getMessage());
+            return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (ValidationException $th) {
             return $this->validationError($th->validator->errors()->first());
         } catch (Throwable $th) {
@@ -74,7 +74,7 @@ class ServiceController extends Controller
 
             return $this->ok([$service]);
         } catch (AppException $th) {
-            return $this->notFound($th->getMessage());
+            return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (ValidationException $th) {
             return $this->validationError($th->validator->errors()->first());
         } catch (Throwable $th) {
@@ -87,8 +87,8 @@ class ServiceController extends Controller
         try {
             $this->serviceService->delete($id, $serviceId);
             return $this->noContent();
-        } catch (ModelNotFoundException $th) {
-            return $this->notFound('Negocio no encontrado');
+        } catch (AppException $th) {
+            return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
             return $this->internalError($th);
         }

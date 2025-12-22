@@ -1,15 +1,16 @@
 <?php
+
 namespace App\Services;
 
 use App\DTO\Service\UpdateServiceDTO;
-use App\Exceptions\BusinessNotFoundException;
+use App\Exceptions\ServiceDoesntBelongToBusinessException;
 use App\Models\Service;
 use App\DTO\Service\CreateServiceDTO;
 use Illuminate\Database\Eloquent\Collection;
 use App\Repositories\Eloquent\BusinessRepository;
 use App\Repositories\Contracts\ServiceRepositoryInterface;
-use ServiceNotFoundException;
-use function PHPUnit\Framework\isNull;
+use App\Exceptions\ServiceNotFoundException;
+use PhpParser\Error;
 
 class ServiceService
 {
@@ -53,12 +54,22 @@ class ServiceService
     {
         $service = $this->findById($dto->businessId, $dto->serviceId);
 
+        // Si el negocio del dto es diferente al del service, se manda una excepción
+        if($dto->businessId != $service->business_id) {
+            throw new ServiceDoesntBelongToBusinessException();
+        }
+
         return $this->serviceRepository->update($service, $dto->toArray());
     }
 
     public function delete(int $businessId, int $serviceId): bool
     {
         $service = $this->findById($businessId, $serviceId);
+        // Si el negocio del dto es diferente al del service, se manda una excepción
+        if($businessId != $service->business_id) {
+            throw new ServiceDoesntBelongToBusinessException();
+        }
+        
         $this->serviceRepository->delete($service);
 
         return true;
