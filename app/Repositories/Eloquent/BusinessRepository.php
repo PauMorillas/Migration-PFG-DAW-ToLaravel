@@ -13,17 +13,17 @@ class BusinessRepository implements BusinessRepositoryInterface
 
     public function create($data): Business
     {
-        return Business::query()->create($data);
+        return Business::create($data);
     }
 
     public function update($business, $data): Business
     {
-        $business->query()->update($data);
+        $business->update($data);
         return $business;
     }
 
     public function delete(Business $business): void
     {
-        $business->query()->delete();
+        $business->delete();
     }
 }

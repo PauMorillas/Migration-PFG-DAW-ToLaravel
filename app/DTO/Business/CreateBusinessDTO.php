@@ -2,7 +2,7 @@
 
 namespace App\DTO\Business;
 
-use App\DTO\BaseBusinessDTO;
+use App\DTO\Business\BaseBusinessDTO;
 use App\Models\Business;
 
 final class CreateBusinessDTO extends BaseBusinessDTO

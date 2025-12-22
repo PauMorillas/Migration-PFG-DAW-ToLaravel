@@ -1,8 +1,9 @@
 <?php
+
 namespace App\DTO\Business;
 
 use App\Models\Business;
-use App\DTO\BaseBusinessDTO;
+use App\DTO\Business\BaseBusinessDTO;
 
 final class UpdateBusinessDTO extends BaseBusinessDTO
 {

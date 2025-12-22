@@ -21,18 +21,18 @@ class ServiceRepository implements ServiceRepositoryInterface
 
     public function create(array $data): Service
     {
-        return Service::query()->create($data);
+        return Service::create($data);
     }
 
     public function update(Service $service, array $data): Service
     {
-        $service->query()->update($data);
+        $service->update($data);
 
         return $service;
     }
 
     public function delete(Service $service): void
     {
-        $service->query()->delete();
+        $service->delete();
     }
 }

@@ -3,6 +3,7 @@
 namespace App\DTO\Service;
 
 use App\Models\Service;
+use App\DTO\Service\BaseServiceDTO;
 
 final class UpdateServiceDTO extends BaseServiceDTO {
     public function __construct(
