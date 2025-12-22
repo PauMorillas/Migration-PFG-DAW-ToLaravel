@@ -94,7 +94,9 @@ class ServiceController extends Controller
         }
     }
 
-    private function validateService(Request $request)
+    // TODO: La validacion dista en los mensajes si se meten más parametros de los que espera la validacion
+    // Hay que hacerla dinámica pasarle solo los campos a validar no toda la request
+    private function validateService(Request $request): void
     {
         $validator = Validator::make(
             $request->all(),
