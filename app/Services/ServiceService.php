@@ -12,11 +12,10 @@ use App\Repositories\Contracts\ServiceRepositoryInterface;
 use App\Exceptions\ServiceNotFoundException;
 use PhpParser\Error;
 
-class ServiceService
+readonly class ServiceService
 {
     public function __construct(
         private readonly ServiceRepositoryInterface $serviceRepository,
-        private readonly BusinessRepository $businessRepository,
         private readonly BusinessService $businessService,
     ) {}
 
@@ -69,7 +68,7 @@ class ServiceService
         if($businessId != $service->business_id) {
             throw new ServiceDoesntBelongToBusinessException();
         }
-        
+
         $this->serviceRepository->delete($service);
 
         return true;
