@@ -5,7 +5,8 @@ namespace App\Repositories\Eloquent;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 
-class UserRepository implements UserRepositoryInterface {
+class UserRepository implements UserRepositoryInterface
+{
 
     public function findById(int $userId): ?User
     {
@@ -26,5 +27,12 @@ class UserRepository implements UserRepositoryInterface {
     public function delete(User $user): void
     {
         $user->delete();
+    }
+
+    public function findByEmail(string $email): ?User
+    {
+        return User::query()
+            ->where('email', $email)
+            ->select()->first();
     }
 }

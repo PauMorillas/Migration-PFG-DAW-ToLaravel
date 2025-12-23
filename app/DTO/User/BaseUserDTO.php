@@ -8,12 +8,11 @@ use JsonSerializable;
 abstract class BaseUserDTO implements Arrayable, JsonSerializable
 {
     public function __construct(
-        protected readonly string $name,
-        protected readonly string $email,
-        protected readonly string $role,
+        protected string $name,
+        protected string $email,
+        protected string $role,
     )
-    {
-    }
+    {}
 
     public function toArray(): array
     {

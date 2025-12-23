@@ -6,8 +6,8 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\BusinessController;
 
 Route::prefix('users')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [UserController::class, 'register']);
+    Route::post('/login', [UserController::class, 'login']);
     Route::get('/{userId}', [UserController::class, 'findById'])
     ->whereNumber('userId');
     Route::put('/{userId}', [UserController::class, 'update'])
