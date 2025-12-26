@@ -7,8 +7,8 @@ use App\DTO\Service\BaseServiceDTO;
 
 final class UpdateServiceDTO extends BaseServiceDTO {
     public function __construct(
-        protected readonly int $businessId,
-        protected readonly int $serviceId,
+        public readonly int $businessId,
+        public readonly int $serviceId,
         string $title,
         string $description,
         string $location,

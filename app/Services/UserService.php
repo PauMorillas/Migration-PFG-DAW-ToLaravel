@@ -14,11 +14,10 @@ use Illuminate\Support\Facades\Hash;
 
 readonly class UserService
 {
-    public function __construct(private readonly UserRepositoryInterface $userRepository)
+    public function __construct(private UserRepositoryInterface $userRepository)
     {
     }
 
-    // TODO: ESTO HAY QUE REVISARLO PARA QUE NO DEVUELVA EL RESPONSE, ESTAMOS EN UN PROBLEMA DE ARQUITECTURA ALO
     public function findById(int $userId): ?UserResponse
     {
         $user = $this->userRepository->findById($userId);
@@ -81,6 +80,17 @@ readonly class UserService
         }
 
         return $user;
+    }
+
+    public function assertExists(int $userId): bool
+    {
+        $exists = $this->userRepository->assertExists($userId);
+
+        if (is_null($exists) | !$exists) {
+            throw new UserNotFoundException();
+        }
+
+        return true;
     }
 
 }

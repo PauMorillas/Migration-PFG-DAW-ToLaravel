@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DTO\Business\BusinessResponse;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use Bus;
 use App\Models\Business;
 use App\DTO\Business\CreateBusinessDTO;
@@ -17,7 +18,8 @@ readonly class BusinessService
 {
 
     public function __construct(
-        private readonly BusinessRepositoryInterface $businessRepository)
+        private BusinessRepositoryInterface $businessRepository,
+        private UserService $userService)
     {
     }
 
@@ -31,6 +33,8 @@ readonly class BusinessService
     public function create(CreateBusinessDTO $dto): ?BusinessResponse
     {
         // TODO: Buscar si existe una sesión o un usuario con ese negocio asociado
+        /* $this->userService->assertExists($dto->userId); */
+
         $business = $this->businessRepository->create($dto->toArray());
 
         return BusinessResponse::createFromModel($business);
