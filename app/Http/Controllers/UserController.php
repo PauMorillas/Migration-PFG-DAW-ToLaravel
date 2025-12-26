@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\DTO\User\CreateUserDTO;
 use App\DTO\User\UpdateUserDTO;
 use App\DTO\User\UserLoginRequest;
-use App\DTO\User\UserResponse;
 use App\Exceptions\AppException;
 use App\Traits\ApiResponseTrait;
 use App\Services\UserService;
@@ -50,7 +49,8 @@ class UserController extends Controller
                 [
                     'email' => 'required|email',
                     'password' => [
-                        'required|string',
+                        'required',
+                        'string',
                         Password::min(8)
                             ->letters()
                             ->numbers(),

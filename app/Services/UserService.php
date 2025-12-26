@@ -18,7 +18,7 @@ readonly class UserService
     {
     }
 
-    // TODO: ESTO HAY QUE REVISARLO PARA QUE NO DEVUELVA EL RESPONSE, ESTAMOS EN UN PORBLEMA DE ARQUITECTURA ALO
+    // TODO: ESTO HAY QUE REVISARLO PARA QUE NO DEVUELVA EL RESPONSE, ESTAMOS EN UN PROBLEMA DE ARQUITECTURA ALO
     public function findById(int $userId): ?UserResponse
     {
         $user = $this->userRepository->findById($userId);
@@ -56,7 +56,7 @@ readonly class UserService
 
     public function delete(int $userId): void
     {
-        $user = $this->findById($userId);
+        $user = $this->getUserModelOrFail($userId);
 
         $this->userRepository->delete($user);
     }
@@ -64,11 +64,23 @@ readonly class UserService
     public function update(UpdateUserDTO $dto): ?UserResponse
     {
         $data = $dto->toArray() + ['password' => Hash::make($dto->getPassword())];
-        $user = $this->findById($data['userId']);
+        $user = $this->getUserModelOrFail($data['userId']);
 
         $this->userRepository->update($user, $data);
 
         return UserResponse::createFromModel($user);
+    }
+
+    // Método privado para obtener la entidad de la bd
+    private function getUserModelOrFail(int $userId): User
+    {
+        $user = $this->userRepository->findById($userId);
+
+        if (is_null($user)) {
+            throw new UserNotFoundException();
+        }
+
+        return $user;
     }
 
 }
