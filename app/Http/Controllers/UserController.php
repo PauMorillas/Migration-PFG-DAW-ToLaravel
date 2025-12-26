@@ -33,8 +33,8 @@ class UserController extends Controller
     public function findById(int $userId): JsonResponse
     {
         try {
-            $userResponse = $this->userService->findById($userId);
-            return $this->ok($userResponse);
+            $userResp = $this->userService->findById($userId);
+            return $this->ok($userResp);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {

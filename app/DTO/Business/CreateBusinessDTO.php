@@ -2,21 +2,22 @@
 
 namespace App\DTO\Business;
 
-use App\DTO\Business\BaseBusinessDTO;
 use App\Models\Business;
 
 final class CreateBusinessDTO extends BaseBusinessDTO
 {
     public function __construct(
-        protected readonly ?int $businessId, // TODO: Lo hice asi por no complicarlo más 
-                                            // pero podemos hacerlo mejor creando un objeto de Respuesta 
-        string $name,
-        string $email,
-        string $phone,
-        string $openHours,
-        string $closeHours,
-        string $openDays,
-    ) {
+        protected readonly ?int $businessId, // TODO: QUITAR YA! ANTERIOR: Lo hice asi por no complicarlo más
+        // pero podemos hacerlo mejor creando un objeto de Respuesta
+        string                  $name,
+        string                  $email,
+        string                  $phone,
+        string                  $openHours,
+        string                  $closeHours,
+        string                  $openDays,
+        protected readonly int  $userId
+    )
+    {
         parent::__construct($name, $email, $phone, $openHours, $closeHours, $openDays);
     }
 
@@ -30,10 +31,12 @@ final class CreateBusinessDTO extends BaseBusinessDTO
             $data['open_hours'],
             $data['close_hours'],
             $data['open_days'],
+            $data['user_id']
         );
     }
 
-    public static function createFromModel(Business $business): self {
+    public static function createFromModel(Business $business): self
+    {
         return new self(
             $business->id,
             $business->name,
@@ -41,14 +44,16 @@ final class CreateBusinessDTO extends BaseBusinessDTO
             $business->phone,
             $business->open_hours,
             $business->close_hours,
-            $business->open_days
+            $business->open_days,
+            $business->user_id
         );
     }
 
     public function toArray(): array
     {
         return parent::toArray() + [
-            'business_id' => $this->businessId,
-        ];
+                'business_id' => $this->businessId,
+                'user_id' => $this->userId,
+            ];
     }
 }

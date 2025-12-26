@@ -25,8 +25,8 @@ class ServiceController extends Controller
     public function findAll(int $id): JsonResponse
     {
         try {
-            $servicios = $this->serviceService->findAll($id);
-            return $this->ok($servicios);
+            $serviciosResp = $this->serviceService->findAll($id);
+            return $this->ok($serviciosResp);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
@@ -37,8 +37,8 @@ class ServiceController extends Controller
     public function findById(int $id, int $serviceId): JsonResponse
     {
         try {
-            $service = $this->serviceService->findById($id, $serviceId);
-            return $this->ok([$service]);
+            $serviceResp = $this->serviceService->findById($id, $serviceId);
+            return $this->ok([$serviceResp]);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (ValidationException $th) {
@@ -53,9 +53,9 @@ class ServiceController extends Controller
         try {
             $this->validateService($request);
             $dto = CreateServiceDTO::createFromArray($request->all(), $businessId);
-            $service = $this->serviceService->create($dto);
+            $serviceResp = $this->serviceService->create($dto);
 
-            return $this->created($service);
+            return $this->created($serviceResp);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (ValidationException $th) {
@@ -70,9 +70,9 @@ class ServiceController extends Controller
         try {
             $this->validateService($request);
             $dto = UpdateServiceDTO::createFromArray($request->all(), $id, $serviceId);
-            $service = $this->serviceService->update($dto);
+            $serviceResp = $this->serviceService->update($dto);
 
-            return $this->ok([$service]);
+            return $this->ok([$serviceResp]);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (ValidationException $th) {
@@ -94,6 +94,7 @@ class ServiceController extends Controller
         }
     }
 
+    // TODO: HACER LA VALIDACION COMO EN EL CONTROLLER DE USER
     // TODO: La validacion dista en los mensajes si se meten más parametros de los que espera la validacion
     // Hay que hacerla dinámica pasarle solo los campos a validar no toda la request
     private function validateService(Request $request): void

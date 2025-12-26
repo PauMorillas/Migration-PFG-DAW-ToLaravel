@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTO\Service\ServiceResponse;
 use App\DTO\Service\UpdateServiceDTO;
 use App\Exceptions\ServiceDoesntBelongToBusinessException;
 use App\Models\Service;
@@ -16,23 +17,83 @@ readonly class ServiceService
 {
     public function __construct(
         private readonly ServiceRepositoryInterface $serviceRepository,
-        private readonly BusinessService $businessService,
-    ) {}
-
-    public function findAll(int $businessId): Collection
+        private readonly BusinessService            $businessService,
+    )
     {
-        $this->businessService->findById($businessId); // Primero se valida la existencia
-
-        return $this->serviceRepository->findAll($businessId);
     }
 
-    public function findById(int $businessId, $serviceId): Service
+    /**
+     * @return ServiceResponse[]
+     */
+    public function findAll(int $businessId): ?array
+    {
+        $this->businessService->assertExists($businessId); // Primero se valida la existencia
+
+        $services = $this->serviceRepository->findAll($businessId);
+
+        return $services->map(function (Service $service) {
+            return ServiceResponse::createFromModel($service);
+        })->toArray();
+    }
+
+    public
+    function findById(int $businessId, $serviceId): ?ServiceResponse
     {
         // TODO: ¿Es correcto? llamar al service en vez de al repo y
-        // volver a validar la existencia, lanzar excepcion, etc.
-        $this->businessService->findById($businessId);
+        // volver a validar la existencia, lanzar excepcion, etc. Yo diría que si
+        $this->businessService->assertExists($businessId);
 
-        $service = $this->serviceRepository->findById($serviceId);
+        $service = $this->getServiceModelOrFail($serviceId);
+
+        $this->assertServiceBelongsToBusiness($service, $businessId);
+
+        return ServiceResponse::createFromModel($service);
+    }
+
+    public
+    function create(CreateServiceDTO $dto): ?ServiceResponse
+    {
+        // REGLA DE NEGOCIO, para crear un servicio se debe tener primero un negocio asociado
+        $this->businessService->assertExists($dto->businessId);
+
+        $service = $this->serviceRepository->create($dto->toArray());
+
+        return ServiceResponse::createFromModel($service);
+    }
+
+    public
+    function update(UpdateServiceDTO $dto): ?ServiceResponse
+    {
+        $this->businessService->assertExists($dto->businessId);
+
+        $service = $this->getServiceModelOrFail($dto->serviceId);
+
+        // Si el negocio del dto es diferente al del service, se manda una excepción
+        $this->assertServiceBelongsToBusiness($service, $dto->businessId);
+
+        $service = $this->serviceRepository->update($service, $dto->toArray());
+
+        return ServiceResponse::createFromModel($service);
+    }
+
+    public
+    function delete(int $businessId, int $serviceId): bool
+    {
+        $this->businessService->assertExists($businessId);
+
+        $service = $this->getServiceModelOrFail($serviceId);
+        // Si el negocio del dto es diferente al del service, se manda una excepción
+        $this->assertServiceBelongsToBusiness($service, $businessId);
+
+        $this->serviceRepository->delete($service);
+
+        return true;
+    }
+
+    private
+    function getServiceModelOrFail(int $id): ?Service
+    {
+        $service = $this->serviceRepository->findById($id);
 
         if (is_null($service)) {
             throw new ServiceNotFoundException();
@@ -41,36 +102,11 @@ readonly class ServiceService
         return $service;
     }
 
-    public function create(CreateServiceDTO $dto): Service
+    private
+    function assertServiceBelongsToBusiness(Service $service, int $businessId): void
     {
-        // REGLA DE NEGOCIO, para crear un servicio se debe tener primero un negocio asociado
-        $this->businessService->findById($dto->businessId);
-
-        return $this->serviceRepository->create($dto->toArray());
-    }
-
-    public function update(UpdateServiceDTO $dto): Service
-    {
-        $service = $this->findById($dto->businessId, $dto->serviceId);
-
-        // Si el negocio del dto es diferente al del service, se manda una excepción
-        if($dto->businessId != $service->business_id) {
+        if ($service->business_id !== $businessId) {
             throw new ServiceDoesntBelongToBusinessException();
         }
-
-        return $this->serviceRepository->update($service, $dto->toArray());
-    }
-
-    public function delete(int $businessId, int $serviceId): bool
-    {
-        $service = $this->findById($businessId, $serviceId);
-        // Si el negocio del dto es diferente al del service, se manda una excepción
-        if($businessId != $service->business_id) {
-            throw new ServiceDoesntBelongToBusinessException();
-        }
-
-        $this->serviceRepository->delete($service);
-
-        return true;
     }
 }
