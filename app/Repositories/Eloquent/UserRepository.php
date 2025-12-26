@@ -35,4 +35,11 @@ class UserRepository implements UserRepositoryInterface
             ->where('email', $email)
             ->select()->first();
     }
+
+    public function assertExists(int $userId): bool
+    {
+        return User::query()
+            ->where('id', $userId)
+            ->exists();
+    }
 }

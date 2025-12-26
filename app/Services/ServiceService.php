@@ -16,8 +16,8 @@ use PhpParser\Error;
 readonly class ServiceService
 {
     public function __construct(
-        private readonly ServiceRepositoryInterface $serviceRepository,
-        private readonly BusinessService            $businessService,
+        private ServiceRepositoryInterface $serviceRepository,
+        private BusinessService            $businessService,
     )
     {
     }

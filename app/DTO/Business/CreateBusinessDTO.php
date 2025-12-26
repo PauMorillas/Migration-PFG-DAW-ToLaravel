@@ -2,20 +2,21 @@
 
 namespace App\DTO\Business;
 
+use App\DTO\Business\BaseBusinessDTO;
 use App\Models\Business;
 
 final class CreateBusinessDTO extends BaseBusinessDTO
 {
     public function __construct(
-        protected readonly ?int $businessId, // TODO: QUITAR YA! ANTERIOR: Lo hice asi por no complicarlo más
+        public readonly ?int $businessId, // TODO: QUITAR YA! ANTERIOR: Lo hice asi por no complicarlo más
         // pero podemos hacerlo mejor creando un objeto de Respuesta
-        string                  $name,
-        string                  $email,
-        string                  $phone,
-        string                  $openHours,
-        string                  $closeHours,
-        string                  $openDays,
-        protected readonly int  $userId
+        string               $name,
+        string               $email,
+        string               $phone,
+        string               $openHours,
+        string               $closeHours,
+        string               $openDays,
+        public readonly int  $userId
     )
     {
         parent::__construct($name, $email, $phone, $openHours, $closeHours, $openDays);
