@@ -15,8 +15,10 @@ return new Class extends Migration {
             $table->integer('duration');
 
             // TODO: QUITAR NULLABLE CUANDO SE ASIGNE LA RELACIÓN
-            $table->foreignId('business_id')->nullable()->constrained('businesses');
-            
+            $table->foreignId('business_id')->nullable()
+                ->constrained('businesses')
+                ->onDelete('cascade');
+
             $table->timestamps();
             $table->softDeletes();
         });

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\DTO\Service;
 
@@ -7,8 +7,8 @@ use App\DTO\Service\BaseServiceDTO;
 
 final class UpdateServiceDTO extends BaseServiceDTO {
     public function __construct(
-        public readonly int $businessId,
-        public readonly int $serviceId,
+        protected readonly int $businessId,
+        protected readonly int $serviceId,
         string $title,
         string $description,
         string $location,

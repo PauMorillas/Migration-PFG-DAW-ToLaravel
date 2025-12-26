@@ -9,14 +9,16 @@ final class UpdateBusinessDTO extends BaseBusinessDTO
 {
     public function __construct(
         public readonly int $businessId,
-        string $name,
-        string $email,
-        string $phone,
-        string $openHours,
-        string $closeHours,
-        string $openDays,
-    ) {
-        parent::__construct( $name, $email, $phone, $openHours, $closeHours, $openDays);
+        string              $name,
+        string              $email,
+        string              $phone,
+        string              $openHours,
+        string              $closeHours,
+        string              $openDays,
+        public readonly int $userId
+    )
+    {
+        parent::__construct($name, $email, $phone, $openHours, $closeHours, $openDays);
     }
 
 
@@ -30,10 +32,12 @@ final class UpdateBusinessDTO extends BaseBusinessDTO
             $data['open_hours'],
             $data['close_hours'],
             $data['open_days'],
+            $data['user_id']
         );
     }
 
-    public static function createFromModel(Business $business): self {
+    public static function createFromModel(Business $business): self
+    {
         return new self(
             $business->id,
             $business->name,
@@ -41,14 +45,16 @@ final class UpdateBusinessDTO extends BaseBusinessDTO
             $business->phone,
             $business->open_hours,
             $business->close_hours,
-            $business->open_days
+            $business->open_days,
+            $business->user_id
         );
     }
 
     public function toArray(): array
     {
         return parent::toArray() + [
-            'business_id' => $this->businessId,
-        ];
+                'business_id' => $this->businessId,
+                'user_id' => $this->userId,
+            ];
     }
 }

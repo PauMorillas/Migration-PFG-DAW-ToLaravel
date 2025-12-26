@@ -26,4 +26,9 @@ class BusinessRepository implements BusinessRepositoryInterface
     {
         $business->delete();
     }
+
+    public function assertExists(int $id): bool
+    {
+        return Business::query()->where('id', $id)->exists();
+    }
 }

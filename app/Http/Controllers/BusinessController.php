@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-// TODO: Revisar los trycatch de errores 500
 class BusinessController extends Controller
 {
 
@@ -25,9 +24,9 @@ class BusinessController extends Controller
     public function findById(int $businessId): JsonResponse
     {
         try {
-            $business = $this->businessService->findById($businessId);
+            $businessResp = $this->businessService->findById($businessId);
 
-            return $this->ok([$business]);
+            return $this->ok([$businessResp]);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
@@ -40,9 +39,9 @@ class BusinessController extends Controller
         try {
             $this->validateBusiness($request);
             $dto = CreateBusinessDTO::createFromArray($request->all());
-            $business = $this->businessService->create($dto); // TODO: Hacer el Response
+            $businessResp = $this->businessService->create($dto);
 
-            return $this->created($business);
+            return $this->created($businessResp);
         } catch (ValidationException $ex) {
             return $this->validationError($ex->validator->errors()->first());
         } catch (Throwable $th) {
@@ -55,9 +54,9 @@ class BusinessController extends Controller
         try {
             $this->validateBusiness($request);
             $dto = UpdateBusinessDTO::createFromArray($request->all(), $businessId);
-            $business = $this->businessService->update($dto);
+            $businessResp = $this->businessService->update($dto);
 
-            return $this->ok([$business]); // TODO: Hacer el Response
+            return $this->ok([$businessResp]);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (ValidationException $ex) {
@@ -86,7 +85,7 @@ class BusinessController extends Controller
             $request->all(),
             [
                 'name' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
+                'email' => 'required|email|max:255|unique:businesses,email',
                 'phone' => 'required|string|max:20',
                 'open_hours' => 'required|date_format:H:i',
                 'close_hours' => 'required|date_format:H:i|after:open_hours',
@@ -96,13 +95,14 @@ class BusinessController extends Controller
                 'name.required' => 'El nombre es obligatorio.',
                 'email.required' => 'El email es obligatorio.',
                 'email.email' => 'El email no tiene un formato válido.',
+                'email.unique' => 'El email ya esta registrado.',
                 'open_hours.required' => 'La hora de apertura es obligatoria.',
                 'open_hours.date_format' => 'La hora de apertura debe tener formato HH:MM.',
                 'close_hours.required' => 'La hora de cierre es obligatoria.',
                 'close_hours.date_format' => 'La hora de cierre debe tener formato HH:MM.',
                 'close_hours.after' => 'La hora de cierre debe ser posterior a la de apertura.',
                 'open_days.required' => 'Los días de apertura son obligatorios.',
-            ]
+            ],
         );
 
         if ($validator->fails()) {
