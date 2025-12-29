@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTO\Booking\BookingRequestDTO;
 use App\DTO\Booking\BookingResponseDTO;
 use App\Exceptions\BookingNotFoundException;
 use App\Models\PreBooking;
@@ -38,6 +39,16 @@ readonly class BookingService
         return $bookings->map(function (stdClass $preBooking) {
             return BookingResponseDTO::createFromStdClass($preBooking);
         })->toArray();
+    }
+
+    public function create(int $businessId, BookingRequestDTO $data): BookingResponseDTO {
+        // TODO: VALIDACIONES
+/*      $this->businessService->assertExists($businessId);*/
+
+        // TODO: revisar si los crea con el id  en null al pasarle el array con el id en null, xD no se
+        $booking = $this->bookingRepository->create($data->toArray());
+
+        return BookingResponseDTO::createFromModel($booking);
     }
 
     public function delete(int $businessId, int $serviceId, int $bookingId): bool

@@ -63,10 +63,18 @@ class BookingController extends Controller
         }
     }
 
-    public function create(): JsonResponse
+    public function create(int $businessId, int $serviceId, Request $request): JsonResponse
     {
-        // $dto = BookingRequestDTO::createFromArray($request->all(), $serviceId, $bookingId);
-        return $this->noContent();
+        try {
+            $dto = BookingRequestDTO::createFromArray($request->all(), $serviceId);
+            $bookingResp = $this->bookingService->create($businessId, $dto);
+
+            return $this->ok($bookingResp);
+        } catch (AppException $th) {
+            return $this->error($th->getMessage(), $th->getStatusCode());
+        } catch (Throwable $th) {
+            return $this->internalError($th);
+        }
     }
 
     public function update(int $businessId, int $serviceId, int $bookingId): JsonResponse

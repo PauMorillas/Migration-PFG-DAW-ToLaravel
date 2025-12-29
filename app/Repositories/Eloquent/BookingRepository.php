@@ -23,9 +23,9 @@ class BookingRepository implements BookingRepositoryInterface
             ->get();
     }
 
-    public function create(): PreBooking
+    public function create(array $data): PreBooking
     {
-        // TODO: Implement create() method.
+        return PreBooking::query()->create($data);
     }
 
     public function delete(PreBooking $preBooking): void
