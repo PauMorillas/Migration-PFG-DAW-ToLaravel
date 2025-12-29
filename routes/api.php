@@ -45,8 +45,9 @@ Route::prefix('businesses')->group(function () {
 
     // === Rutas de Reservas (1-N desde Servicio) ===
     Route::get('{businessId}/services/{serviceId}/bookings',[BookingController::class, 'findAll'])->whereNumber('businessId');
-    Route::post('{businessId}/services/{serviceId}/bookings',[BookingController::class, ''])->whereNumber('businessId');
+    Route::get('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'findById'])->whereNumber('businessId');
+    Route::post('{businessId}/services/{serviceId}/bookings',[BookingController::class, 'create'])->whereNumber('businessId');
     Route::delete('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'delete'])->whereNumber('businessId');
-    Route::put('{businessId}/services/{serviceId}/bookings',[BookingController::class, ''])->whereNumber('businessId');
+    Route::put('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'update'])->whereNumber('businessId');
 });
 // TODO: Autenticación con Sanctum, ->middleware('auth:sanctum')

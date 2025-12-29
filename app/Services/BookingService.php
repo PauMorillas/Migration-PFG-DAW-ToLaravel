@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTO\Booking\BookingResponseDTO;
 use App\Exceptions\BookingNotFoundException;
 use App\Models\PreBooking;
 use App\Repositories\Contracts\BookingRepositoryInterface;
@@ -15,18 +16,26 @@ readonly class BookingService
     {
     }
 
-    public function delete(int $businessId, int $serviceId, int $bookingId): bool
+    public function findById(int $businessId, int $serviceId, int $bookingId): ?BookingResponseDTO
     {
-
-        // Esta funcion valida que el negocio existe y
-        // que el service pertencece al business por eso la uso aquí
+        // Esta función valida que el negocio existe y
+        // que el service pertencece al business por eso la usaré
         $this->serviceService->findById($businessId, $serviceId);
 
         $preBooking = $this->getPreBookingModelOrFail($bookingId);
 
-        if ($preBooking->service_id !== $serviceId) {
-            throw new BookingDoesntBelongToServiceException();
-        }
+        $this->assertBookingBelongsToService($preBooking, $serviceId);
+
+        return BookingResponseDTO::createFromModel($preBooking);
+    }
+
+    public function delete(int $businessId, int $serviceId, int $bookingId): bool
+    {
+        $this->serviceService->findById($businessId, $serviceId);
+
+        $preBooking = $this->getPreBookingModelOrFail($bookingId);
+
+        $this->assertBookingBelongsToService($preBooking, $serviceId);
 
         $this->bookingRepository->delete($preBooking);
 
@@ -44,5 +53,11 @@ readonly class BookingService
         return $preBooking;
     }
 
+    private function assertBookingBelongsToService(PreBooking $preBooking, int $serviceId): void
+    {
+        if ($preBooking->service_id !== $serviceId) {
+            throw new BookingDoesntBelongToServiceException();
+        }
+    }
 
 }
