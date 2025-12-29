@@ -7,7 +7,7 @@ use App\Exceptions\BookingNotFoundException;
 use App\Models\PreBooking;
 use App\Repositories\Contracts\BookingRepositoryInterface;
 use App\Exceptions\BookingDoesntBelongToServiceException;
-
+use stdClass;
 readonly class BookingService
 {
     public function __construct(private BookingRepositoryInterface $bookingRepository,
@@ -27,6 +27,17 @@ readonly class BookingService
         $this->assertBookingBelongsToService($preBooking, $serviceId);
 
         return BookingResponseDTO::createFromModel($preBooking);
+    }
+
+    public function findAll(int $businessId, int $serviceId): array {
+        $this->businessService->assertExists($businessId);
+        $this->serviceService->assertExists($serviceId);
+
+        $bookings = $this->bookingRepository->findAll($businessId);
+
+        return $bookings->map(function (stdClass $preBooking) {
+            return BookingResponseDTO::createFromStdClass($preBooking);
+        })->toArray();
     }
 
     public function delete(int $businessId, int $serviceId, int $bookingId): bool

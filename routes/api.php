@@ -44,10 +44,10 @@ Route::prefix('businesses')->group(function () {
         ->whereNumber('id');
 
     // === Rutas de Reservas (1-N desde Servicio) ===
-    Route::get('{businessId}/services/{serviceId}/bookings',[BookingController::class, 'findAll'])->whereNumber('businessId');
-    Route::get('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'findById'])->whereNumber('businessId');
-    Route::post('{businessId}/services/{serviceId}/bookings',[BookingController::class, 'create'])->whereNumber('businessId');
-    Route::delete('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'delete'])->whereNumber('businessId');
-    Route::put('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'update'])->whereNumber('businessId');
+    Route::get('{businessId}/services/{serviceId}/bookings',[BookingController::class, 'findAll'])->whereNumber(['businessId', 'serviceId']);
+    Route::get('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'findById'])->whereNumber(['businessId', 'serviceId', 'bookingId']);
+    Route::post('{businessId}/services/{serviceId}/bookings',[BookingController::class, 'create'])->whereNumber(['businessId', 'serviceId']);
+    Route::delete('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'delete'])->whereNumber(['businessId', 'serviceId', 'bookingId']);
+    Route::put('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'update'])->whereNumber(['businessId', 'serviceId', 'bookingId']);
 });
 // TODO: Autenticación con Sanctum, ->middleware('auth:sanctum')

@@ -5,6 +5,7 @@ namespace App\DTO\Booking;
 use App\Models\PreBooking;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
+use stdClass;
 
 class BookingResponseDTO implements Arrayable, JsonSerializable
 {
@@ -23,6 +24,16 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
             serviceId: $booking->service_id,
             startDate: $booking->start_date,
             endDate: $booking->end_date,
+        );
+    }
+
+    public static function createFromStdClass(stdClass $row): self
+    {
+        return new self(
+            $row->id,
+            $row->service_id,
+            $row->start_date,
+            $row->end_date,
         );
     }
 

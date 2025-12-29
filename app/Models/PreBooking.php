@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PreBooking extends Model
 {
@@ -23,4 +24,8 @@ class PreBooking extends Model
         'user_phone',
         'pass_hash',
     ];
+
+    public function service(): BelongsTo {
+        return $this->belongsTo(Service::class);
+    }
 }

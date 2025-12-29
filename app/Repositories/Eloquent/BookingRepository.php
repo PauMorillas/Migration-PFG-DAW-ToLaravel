@@ -4,6 +4,8 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\PreBooking;
 use App\Repositories\Contracts\BookingRepositoryInterface;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class BookingRepository implements BookingRepositoryInterface
 {
@@ -11,9 +13,14 @@ class BookingRepository implements BookingRepositoryInterface
     {
         return PreBooking::query()->find($bookingId);
     }
-    public function findAll(): array
+
+    public function findAll(int $businessId): Collection
     {
-        // TODO: Implement findAll() method.
+        return DB::table('pre_bookings')
+            ->join('services', 'services.id', '=', 'pre_bookings.service_id')
+            ->where('services.business_id', $businessId)
+            ->select('pre_bookings.*')
+            ->get();
     }
 
     public function create(): PreBooking
@@ -26,7 +33,7 @@ class BookingRepository implements BookingRepositoryInterface
         $preBooking->delete();
     }
 
-    public function findbyToken(): ?PreBooking
+    public function findByToken(): ?PreBooking
     {
         // TODO: Implement findbyToken() method.
     }

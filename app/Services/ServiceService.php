@@ -109,4 +109,14 @@ readonly class ServiceService
             throw new ServiceDoesntBelongToBusinessException();
         }
     }
+
+    public function assertExists(int $serviceId): bool {
+        $exists = $this->serviceRepository->assertExists($serviceId);
+
+        if(is_null($exists) || !$exists) {
+            throw new ServiceNotFoundException();
+        }
+
+        return $exists;
+    }
 }
