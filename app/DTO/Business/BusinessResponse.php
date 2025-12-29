@@ -6,15 +6,15 @@ use App\Models\Business;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 
-class BusinessResponse implements Arrayable, JsonSerializable
+readonly class BusinessResponse implements Arrayable, JsonSerializable
 {
-    public function __construct(public readonly int $id,
-                                public readonly string $name,
-                                public readonly string $email,
-                                public readonly string $phone,
-                                public readonly string $open_hours,
-                                public readonly string $close_hours,
-                                public readonly int $user_id)
+    public function __construct(public int $id,
+                                public string $name,
+                                public string $email,
+                                public string $phone,
+                                public string $open_hours,
+                                public string $close_hours,
+                                public int $user_id)
     {
     }
 

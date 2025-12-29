@@ -18,10 +18,12 @@ return new Class extends Migration {
 
             // La tabla que tendrá la relación no será esta será bookings
             // esta entidad pretende ser una entidad intermedia para poder lograr bloqueos temporales
-
-            /*$table->foreignId('user_id')->nullable()
-                ->constrained('pre_bookings')
-                ->onDelete('cascade');*/
+            $table->foreignId('service_id')->nullable()
+                ->constrained('services')
+                ->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()
+                ->constrained('users')
+                ->onDelete('cascade');
 
             $table->timestamps();
             $table->softDeletes();

@@ -4,6 +4,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\BookingController;
 
 Route::prefix('users')->group(function () {
     Route::post('/register', [UserController::class, 'register']);
@@ -41,5 +42,11 @@ Route::prefix('businesses')->group(function () {
 
     Route::delete('{id}/services/{serviceId}', [ServiceController::class, 'delete'])
         ->whereNumber('id');
+
+    // === Rutas de Reservas (1-N desde Servicio) ===
+    Route::get('{businessId}/services/{serviceId}/bookings',[BookingController::class, 'findAll'])->whereNumber('businessId');
+    Route::post('{businessId}/services/{serviceId}/bookings',[BookingController::class, ''])->whereNumber('businessId');
+    Route::delete('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'delete'])->whereNumber('businessId');
+    Route::put('{businessId}/services/{serviceId}/bookings',[BookingController::class, ''])->whereNumber('businessId');
 });
 // TODO: Autenticación con Sanctum, ->middleware('auth:sanctum')
