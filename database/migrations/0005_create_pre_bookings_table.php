@@ -14,7 +14,7 @@ return new Class extends Migration {
             $table->string('user_name');
             $table->string('user_email');
             $table->string('user_phone');
-            $table->string('pass_hash');
+            $table->string('user_pass');
 
             // La tabla que tendrá la relación no será esta será bookings
             // esta entidad pretende ser una entidad intermedia para poder lograr bloqueos temporales

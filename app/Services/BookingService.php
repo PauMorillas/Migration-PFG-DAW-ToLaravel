@@ -8,7 +8,10 @@ use App\Exceptions\BookingNotFoundException;
 use App\Models\PreBooking;
 use App\Repositories\Contracts\BookingRepositoryInterface;
 use App\Exceptions\BookingDoesntBelongToServiceException;
+use Nette\Utils\Random;
+use Random\RandomException;
 use stdClass;
+
 readonly class BookingService
 {
     public function __construct(private BookingRepositoryInterface $bookingRepository,
@@ -16,6 +19,7 @@ readonly class BookingService
                                 private BusinessService            $businessService,)
     {
     }
+    private const BOOKING_EXPIRATION_MINS = 30;
 
     public function findById(int $businessId, int $serviceId, int $bookingId): ?BookingResponseDTO
     {
@@ -30,7 +34,8 @@ readonly class BookingService
         return BookingResponseDTO::createFromModel($preBooking);
     }
 
-    public function findAll(int $businessId, int $serviceId): array {
+    public function findAll(int $businessId, int $serviceId): array
+    {
         $this->businessService->assertExists($businessId);
         $this->serviceService->assertExists($serviceId);
 
@@ -41,12 +46,16 @@ readonly class BookingService
         })->toArray();
     }
 
-    public function create(int $businessId, BookingRequestDTO $data): BookingResponseDTO {
-        // TODO: VALIDACIONES
-/*      $this->businessService->assertExists($businessId);*/
+    public function create(int $businessId, BookingRequestDTO $data): BookingResponseDTO
+    {
+        $this->serviceService->findById($businessId, $data->serviceId);
 
-        // TODO: revisar si los crea con el id  en null al pasarle el array con el id en null, xD no se
-        $booking = $this->bookingRepository->create($data->toArray());
+        $payload = $data->toArray() + [
+                'token' => $this->generateRandomToken(),
+                'expiration_date' => now()->addMinutes(self::BOOKING_EXPIRATION_MINS),
+            ];
+
+        $booking = $this->bookingRepository->create($payload);
 
         return BookingResponseDTO::createFromModel($booking);
     }
@@ -81,5 +90,22 @@ readonly class BookingService
             throw new BookingDoesntBelongToServiceException();
         }
     }
+
+    private function generateRandomToken(): string
+    {
+        try {
+            $bytes = random_bytes(20);
+        } catch (RandomException) {
+            $this->generateRandomToken();
+        }
+        /*var_dump(bin2hex($bytes));*/
+        return bin2hex($bytes);
+    }
+
+    /* private function validateExpiredPrebooking(): boolean {
+        if($preBooking->expiration_date->isPast()) {
+            throw new PreBookingExpiredException();
+        }
+    } */
 
 }

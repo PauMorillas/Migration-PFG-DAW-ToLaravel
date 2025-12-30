@@ -10,7 +10,7 @@ readonly class BookingRequestDTO implements Arrayable, JsonSerializable
 {
 
     public function __construct(private ?int    $bookingId,
-                                private int     $serviceId,
+                                public int     $serviceId,
                                 private string  $startDate,
                                 private string  $endDate,
 
