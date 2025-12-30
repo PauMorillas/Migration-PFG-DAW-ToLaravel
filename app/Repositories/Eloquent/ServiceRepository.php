@@ -13,7 +13,7 @@ class ServiceRepository implements ServiceRepositoryInterface
         ->where('business_id', $id)
         ->get();
     }
-    
+
     public function findById(int $serviceId): ?Service
     {
         return Service::query()->find($serviceId);
@@ -34,5 +34,10 @@ class ServiceRepository implements ServiceRepositoryInterface
     public function delete(Service $service): void
     {
         $service->delete();
+    }
+
+    public function assertExists(int $serviceId): bool
+    {
+        return Service::query()->where('id', $serviceId)->exists();
     }
 }

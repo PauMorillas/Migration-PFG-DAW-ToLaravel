@@ -12,4 +12,5 @@ interface ServiceRepositoryInterface
     public function create(array $data): Service;
     public function update(Service $service, array $data): Service;
     public function delete(Service $service): void;
+    public function assertExists(int $serviceId): bool;
 }
