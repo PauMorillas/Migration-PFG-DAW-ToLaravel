@@ -146,7 +146,7 @@ class UserController extends Controller
         array   $attributes): void
     {
         $validator = Validator::make(
-            $request->only(array_keys($rules)), // Sólo validará lo que se le pase
+            $request->only(array_keys($rules)), // Sólo validará lo que se le especifique
             $rules,
             [
                 '*.required' => 'El campo :attribute es obligatorio.',

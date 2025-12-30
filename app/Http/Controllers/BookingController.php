@@ -117,6 +117,7 @@ class BookingController extends Controller
                 '*.string' => 'El campo :attribute debe ser un texto.',
                 '*.email' => 'El campo :attribute debe tener un formato valido.',
                 '*.unique' => 'El :attribute ya esta registrado.',
+                '*.max' => 'La :attribute debe tener al menos :max caracteres.',
                 'user_pass.letters' => 'La :attribute debe contener al menos una letra.',
                 'user_pass.numbers' => 'La :attribute debe contener al menos un número.',
                 'user_pass.min' => 'La :attribute debe tener al menos :min caracteres.',

@@ -111,23 +111,4 @@ class BusinessController extends Controller
 
         return $validator->validated();
     }
-    /* private function validateData(array $data): array
-    {
-        $errors = []; // Formato: ['campo' => 'mensaje de error']
-
-        // Errores por nulo
-        $errors['name'] = $data['name'] ? null : 'El nombre es obligatorio';
-        $errors['email'] = $data['email'] ? null : 'El email es obligatorio';
-        $errors['phone'] = $data['phone'] ? null : 'El teléfono es obligatorio';
-        $errors['open_hours'] = $data['open_hours'] ? null : 'Las horas de apertura son obligatorias';
-        $errors['close_hours'] = $data['close_hours'] ? null : 'Las horas de cierre son obligatorias';
-        $errors['open_days'] = $data['open_days'] ? null : 'Los días de apertura son obligatorios';
-
-        if (isset($data['open_hours']) && isset($data['close_hours']) && $data['open_hours'] < $data['close_hours']) {
-            $errors['open_hours'] = 'La hora de cierre no puede ser mayor a la hora de apertura';
-        }
-
-        // Agregar la lógica de validación según necesidades
-        return $errors;
-    } */
 }

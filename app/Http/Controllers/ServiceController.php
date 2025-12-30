@@ -22,6 +22,14 @@ class ServiceController extends Controller
     {
     }
 
+    private const SERVICE_ATTRIBUTES = [
+        'title' => 'titulo',
+        'description' => 'descripcion',
+        'location' => 'ubicacion',
+        'price' => 'precio',
+        'duration' => 'duracion',
+    ];
+
     public function findAll(int $id): JsonResponse
     {
         try {
@@ -94,13 +102,10 @@ class ServiceController extends Controller
         }
     }
 
-    // TODO: HACER LA VALIDACION COMO EN EL CONTROLLER DE USER
-    // TODO: La validacion dista en los mensajes si se meten más parametros de los que espera la validacion
-    // Hay que hacerla dinámica pasarle solo los campos a validar no toda la request
     private function validateService(Request $request): void
     {
         $validator = Validator::make(
-            $request->all(),
+            $request->only(array_keys(self::SERVICE_ATTRIBUTES)),
             [
                 'title' => 'required|string|max:255',
                 'description' => 'required|string|max:255',
@@ -111,14 +116,11 @@ class ServiceController extends Controller
             [
                 '*.required' => 'El campo :attribute es obligatorio.', // Placeholder que sustituye Laravel con los nombres del 4to parámetro
                 '*.string' => 'El campo :attribute debe ser un texto.',
+                '*.numeric' => 'El campo :attribute debe ser de tipo numérico',
+                '*.max' => 'El campo :attribute debe tener menos de :max caracteres.',
+                '*.min' => 'El campo :attribute debe tener al menos :min caracteres.',
             ],
-            [
-                'title' => 'título',
-                'description' => 'descripción',
-                'location' => 'ubicación',
-                'price' => 'precio',
-                'duration' => 'duración',
-            ]
+            self::SERVICE_ATTRIBUTES
         );
 
         if ($validator->fails()) {
