@@ -6,11 +6,12 @@ use App\Models\User;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 
-class UserResponse implements Arrayable, JsonSerializable
+// todo: Añadir el teléfono a la entidad
+readonly class UserResponse implements Arrayable, JsonSerializable
 {
-    public function __construct(public readonly int $id,
-                                public readonly string $name,
-                                public readonly string $email)
+    public function __construct(public int $id,
+                                public string $name,
+                                public string $email)
     {
 
     }

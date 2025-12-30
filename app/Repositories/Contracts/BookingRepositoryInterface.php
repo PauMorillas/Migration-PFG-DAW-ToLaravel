@@ -2,15 +2,19 @@
 
 namespace App\Repositories\Contracts;
 
-use App\Models\PreBooking;
+use App\Models\Booking;
 use Illuminate\Support\Collection;
+use stdClass;
 
-interface BookingRepositoryInterface {
-    // TODO: En principio solo necesitaré estas funciones
-    public function findById(int $bookingId): ?PreBooking;
+interface BookingRepositoryInterface
+{
+    /**
+     * @return Array<stdClass>
+     * */
+    public function findAllWithQueryBuilder(int $businessId): Collection;
+    /**
+     * @return Array<stdClass>
+     * */
     public function findAll(int $businessId): Collection;
-    public function create(array $data): PreBooking;
-    public function delete(PreBooking $preBooking): void;
-    public function findByToken(): ?PreBooking;
-    public function countOverlappingPreReserva(): ?PreBooking; // TODO: ESTO DEVOLVERÁ UNA COLECCIÓN?
+    public function update(Booking $booking, array $data): Booking;
 }

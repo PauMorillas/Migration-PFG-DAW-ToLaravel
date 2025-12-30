@@ -4,6 +4,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\PreBookingController;
 use App\Http\Controllers\BookingController;
 
 Route::prefix('users')->group(function () {
@@ -44,10 +45,14 @@ Route::prefix('businesses')->group(function () {
         ->whereNumber('id');
 
     // === Rutas de Reservas (1-N desde Servicio) ===
-    Route::get('{businessId}/services/{serviceId}/bookings',[BookingController::class, 'findAll'])->whereNumber(['businessId', 'serviceId']);
-    Route::get('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'findById'])->whereNumber(['businessId', 'serviceId', 'bookingId']);
-    Route::post('{businessId}/services/{serviceId}/bookings',[BookingController::class, 'create'])->whereNumber(['businessId', 'serviceId']);
-    Route::delete('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'delete'])->whereNumber(['businessId', 'serviceId', 'bookingId']);
-    Route::put('{businessId}/services/{serviceId}/bookings/{bookingId}',[BookingController::class, 'update'])->whereNumber(['businessId', 'serviceId', 'bookingId']);
+    Route::get('{businessId}/services/{serviceId}/bookings',[PreBookingController::class, 'findAll'])->whereNumber(['businessId', 'serviceId']);
+    Route::get('{businessId}/services/{serviceId}/bookings/{bookingId}',[PreBookingController::class, 'findById'])->whereNumber(['businessId', 'serviceId', 'bookingId']);
+    Route::post('{businessId}/services/{serviceId}/bookings',[PreBookingController::class, 'create'])->whereNumber(['businessId', 'serviceId']);
+    Route::delete('{businessId}/services/{serviceId}/bookings/{bookingId}',[PreBookingController::class, 'delete'])->whereNumber(['businessId', 'serviceId', 'bookingId']);
+    Route::put('{businessId}/services/{serviceId}/bookings/{bookingId}',[PreBookingController::class, 'update'])->whereNumber(['businessId', 'serviceId', 'bookingId']);
+
+    // === Rutas de Reservas ===
+    Route::get('{businessId}/services/{serviceId}/bookings/v2', [BookingController::class, 'findAll'])->whereNumber(['businessId', 'serviceId']);
+    Route::get('{businessId}/services/{serviceId}/bookings/{bookingId}/v2', [BookingController::class, 'updateBookingStatus'])->whereNumber(['businessId', 'serviceId', 'bookingId']);
 });
 // TODO: Autenticación con Sanctum, ->middleware('auth:sanctum')

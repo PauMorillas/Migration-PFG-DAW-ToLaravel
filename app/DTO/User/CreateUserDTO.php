@@ -13,11 +13,12 @@ class CreateUserDTO extends BaseUserDTO implements Arrayable, JsonSerializable
     public function __construct(
         protected string $name,
         protected string $email,
-        protected readonly string $password,
-        protected string $role
+        protected string $password,
+        protected string $role,
+        protected ?string $telephone = null,
     )
     {
-        parent::__construct($name, $email, $role);
+        parent::__construct($name, $email, $role, $telephone);
     }
 
     public static function createFromArray(array $data): self
@@ -25,12 +26,17 @@ class CreateUserDTO extends BaseUserDTO implements Arrayable, JsonSerializable
         return new self(
             name: $data['name'],
             email: $data['email'],
-            password: $data['password'], // Aquí si existe
+            password: $data['password'], // Aquí sí existe
             role: $data['role'],
+            telephone: array_key_exists('telephone', $data)
+                ? $data['telephone']
+                : null,
         );
     }
 
-    public function createFromModel(User $user): self
+    /*
+     * Esto ahora lo hacen los objetos de respuesta
+     * public function createFromModel(User $user): self
     {
         return new self(
             name: $user->name,
@@ -38,15 +44,7 @@ class CreateUserDTO extends BaseUserDTO implements Arrayable, JsonSerializable
             password: null, // El pass nunca lo mostraremos
             role: $user->role,
         );
-    }
-
-    public function toArray(): array {
-        return [
-            'name' => $this->name,
-            'email' => $this->email,
-            'role' => $this->role,
-        ];
-    }
+    }*/
 
     public function getPassword(): ?string
     {

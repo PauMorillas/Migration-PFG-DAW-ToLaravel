@@ -11,13 +11,14 @@ use App\DTO\User\BaseUserDTO;
 class UpdateUserDTO extends BaseUserDTO implements Arrayable, JsonSerializable
 {
     public function __construct(
-        protected readonly string $userId,
+        protected string $userId,
         protected string $name,
         protected string $email,
-        protected readonly ?string $password,
-        protected string $role)
+        protected ?string $password,
+        protected string $role,
+        protected ?string $telephone = null)
     {
-        parent::__construct($name, $email, $role);
+        parent::__construct($name, $email, $role, $telephone);
     }
 
     public static function createFromArray(array $data, int $userId): self
@@ -28,6 +29,9 @@ class UpdateUserDTO extends BaseUserDTO implements Arrayable, JsonSerializable
             email: $data['email'],
             password: $data['password'],
             role: $data['role'],
+            telephone: array_key_exists('telephone', $data)
+                ? $data['telephone']
+                : null,
         );
     }
 
@@ -39,15 +43,13 @@ class UpdateUserDTO extends BaseUserDTO implements Arrayable, JsonSerializable
             email: $user->email,
             password: null,
             role: $user->role,
+            telephone: $user->telephone,
         );
     }
 
     public function toArray(): array {
-        return [
+        return parent::toArray() + [
             'userId'=> $this->userId,
-            'name'=> $this->name,
-            'email'=> $this->email,
-            'role'=> $this->role,
         ];
     }
 

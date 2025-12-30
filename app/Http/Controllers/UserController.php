@@ -10,6 +10,7 @@ use App\Traits\ApiResponseTrait;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,6 +23,7 @@ class UserController extends Controller
     private const USER_ATTRIBUTES = [
         'name' => 'nombre',
         'email' => 'correo electronico',
+        'telephone' => 'telefono',
         'password' => 'contraseña',
         'role' => 'rol',
     ];
@@ -76,6 +78,7 @@ class UserController extends Controller
                 [
                     'name' => 'required|string|max:255',
                     'email' => 'required|email|unique:users,email',
+                    'telephone' => 'nullable|numeric|digits:9|unique:users,telephone',
                     'password' => [
                         'required',
                         'string',
@@ -105,7 +108,17 @@ class UserController extends Controller
             $this->validate($request,
                 [
                     'name' => 'required|string|max:255',
-                    'email' => 'required|email|unique:users,email',
+                    'email' => [
+                        'required',
+                        'email',
+                        Rule::unique('users', 'email')->ignore($userId),
+                    ],
+                    'telephone' => [
+                        'nullable',
+                        'numeric',
+                        'digits:9',
+                        Rule::unique('users', 'telephone')->ignore($userId),
+                    ],
                     'password' => [
                         'required',
                         'string',
@@ -156,7 +169,9 @@ class UserController extends Controller
                 'password.letters' => 'La :attribute debe contener al menos una letra.',
                 'password.numbers' => 'La :attribute debe contener al menos un número.',
                 'password.min' => 'La :attribute debe tener al menos :min caracteres.',
-            ],
+                'telephone.unique' => 'El teléfono ya está en uso por otro usuario.',
+                'telephone.digits' => 'El teléfono debe tener el formato español, es decir, :digits digitos'
+                ],
             $attributes
         );
 

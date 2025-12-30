@@ -5,22 +5,29 @@ namespace App\DTO\User;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 
-abstract class BaseUserDTO implements Arrayable, JsonSerializable
+class BaseUserDTO implements Arrayable, JsonSerializable
 {
     public function __construct(
         protected string $name,
         protected string $email,
         protected string $role,
+        protected ?string $telephone,
     )
     {}
 
     public function toArray(): array
     {
-        return [
+        $data = [
             'name' => $this->name,
             'email' => $this->email,
             'role' => $this->role,
         ];
+
+        if ($this->telephone !== null) {
+            $data['telephone'] = $this->telephone;
+        }
+
+        return $data;
     }
 
     public function jsonSerialize(): array
