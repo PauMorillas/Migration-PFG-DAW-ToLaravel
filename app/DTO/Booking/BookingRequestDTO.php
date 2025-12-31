@@ -10,7 +10,7 @@ readonly class BookingRequestDTO implements Arrayable, JsonSerializable
 {
 
     public function __construct(private ?int    $bookingId,
-                                public int     $serviceId,
+                                public int      $serviceId,
                                 private string  $startDate,
                                 private string  $endDate,
 
@@ -36,24 +36,10 @@ readonly class BookingRequestDTO implements Arrayable, JsonSerializable
         );
     }
 
-    public static function createFromModel(PreBooking $booking): self
-    {
-        return new self(
-            $booking->id,
-            $booking->service_id,
-            $booking->start_date,
-            $booking->end_date,
-            $booking->user_name,
-            $booking->user_email,
-            $booking->user_phone,
-            $booking->user_pass
-        );
-    }
-
     public function toArray(): array
     {
         return [
-            'booking_id' => $this->bookingId, // TODO: Se llamará asi o simplemente ID?
+            'id' => $this->bookingId,
             'service_id' => $this->serviceId,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
@@ -65,8 +51,7 @@ readonly class BookingRequestDTO implements Arrayable, JsonSerializable
         ];
     }
 
-    public
-    function jsonSerialize(): array
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }

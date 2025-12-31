@@ -3,6 +3,7 @@
 namespace App\DTO\Booking;
 
 use App\DTO\User\UserResponseDTO;
+use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\PreBooking;
 use App\Models\User;
@@ -17,12 +18,14 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
                                 private int              $serviceId,
                                 private string           $startDate,
                                 private string           $endDate,
+                                private ?BookingStatus          $status = null,
                                 private ?UserResponseDTO $userResponse = null,)
     {
 
     }
 
-    public static function createFromPreBookingModel(PreBooking $booking): self {
+    public static function createFromPreBookingModel(PreBooking $booking): self
+    {
         return new self(
             bookingId: $booking->id,
             serviceId: $booking->service_id,
@@ -31,12 +34,14 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
         );
     }
 
-    public static function createFromBookingModel(Booking $booking, ?User $user = null): self {
+    public static function createFromBookingModel(Booking $booking, ?User $user = null): self
+    {
         return new self(
             bookingId: $booking->id,
             serviceId: $booking->service_id,
             startDate: $booking->start_date,
             endDate: $booking->end_date,
+            status: $booking->status,
             userResponse: $user ? UserResponseDTO::createFromModel($user) : null
         );
     }
@@ -48,6 +53,7 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
             $row->service_id,
             $row->start_date,
             $row->end_date,
+            $row->status,
         );
     }
 
@@ -58,6 +64,7 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
             'service_id' => $this->serviceId,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
+            'status' => $this->status,
             'user' => $this->userResponse, // UserResponseDTO ya implementa JsonSerializable
         ];
     }

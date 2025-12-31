@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\Booking\BookingDTO;
+use App\DTO\Booking\BookingRequestDTO;
+use App\Enums\BookingStatus;
 use App\Exceptions\AppException;
 use App\Services\BookingService;
 use App\Traits\ApiResponseTrait;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Throwable;
 
 class BookingController extends Controller
@@ -33,8 +36,21 @@ class BookingController extends Controller
         }
     }
 
-    public function updateBookingStatus(Request $request)
+    public function updateBookingStatus(int     $businessId, int $serviceId, int $bookingId,
+                                        Request $request)
     {
-        return $this->noContent();
+        try {
+            $userId = 1;
+            $status = BookingStatus::from($request->get('status'));
+            $bookingDTO = BookingDTO::createFromArray($request->all(), $serviceId, $userId, $bookingId, $status);
+
+            var_dump($bookingDTO);
+            $bookingResp = $this->bookingService->updateBookingStatus($bookingDTO, $businessId, $serviceId, $userId, $bookingId);
+            return $this->ok($bookingResp);
+        } catch (AppException $th) {
+            return $this->error($th->getMessage(), $th->getStatusCode());
+        } catch (Throwable $th) {
+            return $this->internalError($th);
+        }
     }
 }

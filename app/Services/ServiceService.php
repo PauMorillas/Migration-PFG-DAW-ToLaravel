@@ -50,8 +50,7 @@ readonly class ServiceService
         return ServiceResponse::createFromModel($service);
     }
 
-    public
-    function create(CreateServiceDTO $dto): ?ServiceResponse
+    public function create(CreateServiceDTO $dto): ?ServiceResponse
     {
         // REGLA DE NEGOCIO, para crear un servicio se debe tener primero un negocio asociado
         $this->businessService->assertExists($dto->businessId);

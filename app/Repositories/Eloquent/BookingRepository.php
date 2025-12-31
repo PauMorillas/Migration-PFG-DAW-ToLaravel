@@ -38,4 +38,14 @@ class BookingRepository implements BookingRepositoryInterface
     {
         // TODO: Implement update() method.
     }
+
+    public function findById(int $bookingId): Booking
+    {
+        return Booking::query()->find($bookingId);
+    }
+
+    public function assertExists(int $bookingId): bool
+    {
+        return Booking::query()->where('id', $bookingId)->exists();
+    }
 }

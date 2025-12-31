@@ -8,6 +8,7 @@ use stdClass;
 
 interface BookingRepositoryInterface
 {
+    public function findById(int $bookingId): Booking;
     /**
      * @return Array<stdClass>
      * */
@@ -17,4 +18,6 @@ interface BookingRepositoryInterface
      * */
     public function findAll(int $businessId): Collection;
     public function update(Booking $booking, array $data): Booking;
+
+    public function assertExists(int $bookingId): bool;
 }
