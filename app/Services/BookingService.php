@@ -2,23 +2,29 @@
 
 namespace App\Services;
 
+use App\DTO\Booking\BookingResponseDTO;
+use App\Models\Booking;
 use App\Repositories\Contracts\BookingRepositoryInterface;
 use Illuminate\Support\Collection;
 
 readonly class BookingService
 {
-    public function __construct(private BookingRepositoryInterface $bookingRepository)
+    public function __construct(private BookingRepositoryInterface $bookingRepository,
+                                private ServiceService $serviceService)
     {
     }
 
-    public function findAll(int $businessId, int $serviceId, int $userId): array {
-        // TODO: VALIDACIONES
+    public function findAll(int $businessId, int $serviceId, int $userId): array
+    {
+        // TODO: VALIDACIONES DE USUARIO??
+        $this->serviceService->findById($businessId, $serviceId);
 
         $bookings = $this->bookingRepository->findAll($businessId);
 
-        // todo vas por aki
-        // $bookingsResp = $bookings->map();
-
-        return [];
+        return $bookings->map(callback: function (Booking $booking) {
+            return BookingResponseDTO::createFromBookingModel($booking, $booking->user);
+            // Para acceder a una entidad de eloquent (que tenga relaciones definidas)
+            // se hace como si fuese una propiedad
+        })->toArray();
     }
 }

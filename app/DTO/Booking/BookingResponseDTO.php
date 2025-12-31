@@ -2,7 +2,8 @@
 
 namespace App\DTO\Booking;
 
-use App\DTO\User\UserResponse;
+use App\DTO\User\UserResponseDTO;
+use App\Models\Booking;
 use App\Models\PreBooking;
 use App\Models\User;
 use Illuminate\Contracts\Support\Arrayable;
@@ -12,22 +13,31 @@ use stdClass;
 class BookingResponseDTO implements Arrayable, JsonSerializable
 {
 
-    public function __construct(private ?int   $bookingId,
-                                private int    $serviceId,
-                                private string $startDate,
-                                private string $endDate,
-                                private ?UserResponse $userResponse = null,)
+    public function __construct(private ?int             $bookingId,
+                                private int              $serviceId,
+                                private string           $startDate,
+                                private string           $endDate,
+                                private ?UserResponseDTO $userResponse = null,)
     {
 
     }
 
-    public static function createFromModel(PreBooking $booking, ?User $user = null): self {
+    public static function createFromPreBookingModel(PreBooking $booking): self {
         return new self(
             bookingId: $booking->id,
             serviceId: $booking->service_id,
             startDate: $booking->start_date,
             endDate: $booking->end_date,
-            userResponse: $user ? UserResponse::createFromModel($user) : null
+        );
+    }
+
+    public static function createFromBookingModel(Booking $booking, ?User $user = null): self {
+        return new self(
+            bookingId: $booking->id,
+            serviceId: $booking->service_id,
+            startDate: $booking->start_date,
+            endDate: $booking->end_date,
+            userResponse: $user ? UserResponseDTO::createFromModel($user) : null
         );
     }
 
@@ -48,6 +58,7 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
             'service_id' => $this->serviceId,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
+            'user' => $this->userResponse, // UserResponseDTO ya implementa JsonSerializable
         ];
     }
 

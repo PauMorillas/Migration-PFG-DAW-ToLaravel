@@ -5,7 +5,7 @@ namespace App\Services;
 use App\DTO\User\CreateUserDTO;
 use App\DTO\User\UpdateUserDTO;
 use App\DTO\User\UserLoginRequest;
-use App\DTO\User\UserResponse;
+use App\DTO\User\UserResponseDTO;
 use App\Exceptions\InvalidCredentialsException;
 use App\Exceptions\UserNotFoundException;
 use App\Models\User;
@@ -18,7 +18,7 @@ readonly class UserService
     {
     }
 
-    public function findById(int $userId): ?UserResponse
+    public function findById(int $userId): ?UserResponseDTO
     {
         $user = $this->userRepository->findById($userId);
 
@@ -26,10 +26,10 @@ readonly class UserService
             throw new UserNotFoundException();
         }
 
-        return UserResponse::createFromModel($user);
+        return UserResponseDTO::createFromModel($user);
     }
 
-    public function login(UserLoginRequest $dto): ?UserResponse
+    public function login(UserLoginRequest $dto): ?UserResponseDTO
     {
         $user = $this->userRepository->findByEmail(
             $dto->getEmail());
@@ -42,15 +42,15 @@ readonly class UserService
             throw new InvalidCredentialsException();
         }
 
-        return UserResponse::createFromModel($user);
+        return UserResponseDTO::createFromModel($user);
     }
 
-    public function register(CreateUserDTO $dto): ?UserResponse
+    public function register(CreateUserDTO $dto): ?UserResponseDTO
     {
         $data = $dto->toArray() + ['password' => Hash::make($dto->getPassword())];
         $user = $this->userRepository->create($data);
 
-        return UserResponse::createFromModel($user);
+        return UserResponseDTO::createFromModel($user);
     }
 
     public function delete(int $userId): void
@@ -60,14 +60,14 @@ readonly class UserService
         $this->userRepository->delete($user);
     }
 
-    public function update(UpdateUserDTO $dto): ?UserResponse
+    public function update(UpdateUserDTO $dto): ?UserResponseDTO
     {
         $data = $dto->toArray() + ['password' => Hash::make($dto->getPassword())];
         $user = $this->getUserModelOrFail($data['userId']);
 
         $this->userRepository->update($user, $data);
 
-        return UserResponse::createFromModel($user);
+        return UserResponseDTO::createFromModel($user);
     }
 
     // Método privado para obtener la entidad de la bd

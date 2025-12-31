@@ -29,9 +29,9 @@ readonly class PreBookingService
 
         $preBooking = $this->getPreBookingModelOrFail($bookingId);
 
-        $this->assertBookingBelongsToService($preBooking, $serviceId);
+        $this->assertPreBookingBelongsToService($preBooking, $serviceId);
 
-        return BookingResponseDTO::createFromModel($preBooking);
+        return BookingResponseDTO::createFromPreBookingModel($preBooking);
     }
 
     public function findAll(int $businessId, int $serviceId): array
@@ -39,9 +39,9 @@ readonly class PreBookingService
         $this->businessService->assertExists($businessId);
         $this->serviceService->assertExists($serviceId);
 
-        $bookings = $this->bookingRepository->findAll($businessId);
+        $preBookings = $this->bookingRepository->findAll($businessId);
 
-        return $bookings->map(function (stdClass $preBooking) {
+        return $preBookings->map(function (stdClass $preBooking) {
             return BookingResponseDTO::createFromStdClass($preBooking);
         })->toArray();
     }
@@ -55,9 +55,9 @@ readonly class PreBookingService
                 'expiration_date' => now()->addMinutes(self::BOOKING_EXPIRATION_MINS),
             ];
 
-        $booking = $this->bookingRepository->create($payload);
+        $preBooking = $this->bookingRepository->create($payload);
 
-        return BookingResponseDTO::createFromModel($booking);
+        return BookingResponseDTO::createFromPreBookingModel($preBooking);
     }
 
     public function delete(int $businessId, int $serviceId, int $bookingId): bool
@@ -66,7 +66,7 @@ readonly class PreBookingService
 
         $preBooking = $this->getPreBookingModelOrFail($bookingId);
 
-        $this->assertBookingBelongsToService($preBooking, $serviceId);
+        $this->assertPreBookingBelongsToService($preBooking, $serviceId);
 
         $this->bookingRepository->delete($preBooking);
 
@@ -84,7 +84,7 @@ readonly class PreBookingService
         return $preBooking;
     }
 
-    private function assertBookingBelongsToService(PreBooking $preBooking, int $serviceId): void
+    private function assertPreBookingBelongsToService(PreBooking $preBooking, int $serviceId): void
     {
         if ($preBooking->service_id !== $serviceId) {
             throw new BookingDoesntBelongToServiceException();
@@ -102,6 +102,7 @@ readonly class PreBookingService
         return bin2hex($bytes);
     }
 
+    // TODO: Validar que el tiempo para aceptar la PreRseserva no expiró
     /* private function validateExpiredPrebooking(): boolean {
         if($preBooking->expiration_date->isPast()) {
             throw new PreBookingExpiredException();

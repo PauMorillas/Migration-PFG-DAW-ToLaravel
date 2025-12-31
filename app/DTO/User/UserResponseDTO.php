@@ -6,21 +6,23 @@ use App\Models\User;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 
-// todo: Añadir el teléfono a la entidad
-readonly class UserResponse implements Arrayable, JsonSerializable
+readonly class UserResponseDTO implements Arrayable, JsonSerializable
 {
-    public function __construct(public int $id,
-                                public string $name,
-                                public string $email)
+    public function __construct(public int      $id,
+                                private string  $name,
+                                private string  $email,
+                                private ?string $telephone = null)
     {
 
     }
+
     public static function createFromModel(User $user): self
     {
         return new self(
             id: $user->id,
             name: $user->name,
-            email: $user->email
+            email: $user->email,
+            telephone: $user->telephone,
         );
     }
 
@@ -29,7 +31,8 @@ readonly class UserResponse implements Arrayable, JsonSerializable
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'email' => $this->email
+            'email' => $this->email,
+            'telephone' => $this->telephone,
         ];
     }
 
