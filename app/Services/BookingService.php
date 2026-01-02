@@ -67,6 +67,7 @@ readonly class BookingService
         $booking = $this->getBookingModelWithUserOrFail($bookingDTO->bookingId);
 
         $data = $bookingDTO->toArray();
+        // Actualizaremos SOLO el estado
         $updateData = ['status' => $data['status']];
         // Quitamos el user id y resto de datos por posible actualización de estos
         // (Puede resolverse con un DTO para este caso de uso)

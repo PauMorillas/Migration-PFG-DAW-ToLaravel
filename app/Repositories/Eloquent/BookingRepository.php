@@ -2,10 +2,12 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Repositories\Contracts\BookingRepositoryInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use function Laravel\Prompts\table;
 
 class BookingRepository implements BookingRepositoryInterface
 {
@@ -60,4 +62,18 @@ class BookingRepository implements BookingRepositoryInterface
         return Booking::query()->where('id', $bookingId)->exists();
     }
 
+    public function countOverlappingBookings(int $serviceId, string $startDate, string $endDate, ?int $ignoreBookingId = null, ?BookingStatus $status = BookingStatus::ACTIVA): int
+    {
+        $query = DB::table('bookings')
+            ->where('service_id', $serviceId)
+            ->where('start_date', '<', $endDate)
+            ->where('end_date', '>', $startDate)
+            ->where('status', '=', $status->value);
+
+        if ($ignoreBookingId !== null) {
+            $query->where('id', '!=', $ignoreBookingId);
+        }
+
+        return $query->count();
+    }
 }
