@@ -34,7 +34,7 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
         );
     }
 
-    public static function createFromBookingModel(Booking $booking, ?User $user = null): self
+    public static function createFromBookingModel(Booking $booking, bool $includeUser): self
     {
         return new self(
             bookingId: $booking->id,
@@ -42,7 +42,7 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
             startDate: $booking->start_date,
             endDate: $booking->end_date,
             status: $booking->status,
-            userResponse: $user ? UserResponseDTO::createFromModel($user) : null
+            userResponse: $includeUser ? UserResponseDTO::createFromModel($booking->user) : null
         );
     }
 

@@ -8,7 +8,6 @@ use App\Exceptions\BookingDoesntBelongToServiceException;
 use App\Exceptions\BookingNotFoundException;
 use App\Models\Booking;
 use App\Repositories\Contracts\BookingRepositoryInterface;
-use Illuminate\Support\Collection;
 
 readonly class BookingService
 {
@@ -17,23 +16,24 @@ readonly class BookingService
     {
     }
 
-    public
-    function findById(int $businessId, int $serviceId, int $userId, int $bookingId): BookingResponseDTO
+    public function findById(int $businessId, int $serviceId,
+                             int $userId, int $bookingId, bool $includeUser): BookingResponseDTO
     {
         // TODO: VALIDACIONES DE USUARIO(GERENTE) QUE SEGURAMENTE SE HAGAN EN EL FIND DE business
         $this->assertExists($bookingId);
 
         $this->serviceService->findById($businessId, $serviceId);
 
-        $booking = $this->getBookingModelOrFail($bookingId);
+        $booking = $includeUser
+            ? $this->getBookingModelWithUserOrFail($bookingId)
+            : $this->getBookingModelOrFail($bookingId);
 
         $this->assertBookingBelongsToService($booking, $serviceId);
 
-        return BookingResponseDTO::createFromBookingModel($booking, $booking->user);
+        return BookingResponseDTO::createFromBookingModel($booking, $includeUser);
     }
 
-    public
-    function findAllByBusinessId(int $businessId, int $serviceId): array
+    public function findAllByBusinessId(int $businessId, int $serviceId): array
     {
         // TODO: VALIDACIONES DE USUARIO Gerente??
         $this->serviceService->findById($businessId, $serviceId);
@@ -41,25 +41,26 @@ readonly class BookingService
         $bookings = $this->bookingRepository->findAllByBusinessId($businessId);
 
         return $bookings->map(callback: function (Booking $booking) {
-            return BookingResponseDTO::createFromBookingModel($booking, $booking->user);
+            $includeUser = true;
+            return BookingResponseDTO::createFromBookingModel($booking, $includeUser);
             // Para acceder a una entidad de eloquent (que tenga relaciones definidas)
             // se hace como si fuese una propiedad
         })->toArray();
     }
 
-    // TODO: VAS POR AKI
-    public function updateBookingStatus(BookingDTO $bookingDTO, int $businessId): BookingResponseDTO
+    public function updateBookingStatus
+    (BookingDTO $bookingDTO, int $businessId): BookingResponseDTO
     {
+        $includeUser = true;
         // TODO: VALIDACIONES DE USUARIO (Gerente)
         $this->serviceService->findById($businessId, $bookingDTO->serviceId);
         $booking = $this->getBookingModelWithUserOrFail($bookingDTO->bookingId);
         $booking = $this->bookingRepository->updateBookingStatus($booking, $bookingDTO->toArray());
 
-        return BookingResponseDTO::createFromBookingModel($booking, $booking->user);
+        return BookingResponseDTO::createFromBookingModel($booking, $includeUser);
     }
 
-    private
-    function getBookingModelOrFail(int $bookingId): ?Booking
+    private function getBookingModelOrFail(int $bookingId): ?Booking
     {
         $booking = $this->bookingRepository->findById($bookingId);
 
@@ -70,8 +71,9 @@ readonly class BookingService
         return $booking;
     }
 
-    private function getBookingModelWithUserOrFail(int $bookingId): ?Booking {
-        $booking = $this->bookingRepository->findById($bookingId);
+    private function getBookingModelWithUserOrFail(int $bookingId): ?Booking
+    {
+        $booking = $this->bookingRepository->findByIdWithUser($bookingId);
 
         if (is_null($booking)) {
             throw new BookingNotFoundException();
@@ -80,8 +82,7 @@ readonly class BookingService
         return $booking;
     }
 
-    private
-    function assertExists(int $bookingId): bool
+    private function assertExists(int $bookingId): bool
     {
         $exists = $this->bookingRepository->assertExists($bookingId);
 
@@ -92,8 +93,8 @@ readonly class BookingService
         return $exists;
     }
 
-    private
-    function assertBookingBelongsToService(Booking $booking, int $serviceId): void
+    private function assertBookingBelongsToService(Booking $booking,
+                                                   int     $serviceId): void
     {
         if ($booking->service_id !== $serviceId) {
             throw new BookingDoesntBelongToServiceException();
