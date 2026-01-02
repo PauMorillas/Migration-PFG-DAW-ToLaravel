@@ -48,6 +48,16 @@ readonly class BookingService
         })->toArray();
     }
 
+    // todo: sacar el idCliente de la sesión
+    public function create(int $businessId, BookingDTO $bookingDTO): BookingResponseDTO
+    {
+        $this->serviceService->findById($businessId, $bookingDTO->serviceId);
+
+        $booking = $this->bookingRepository->create($bookingDTO->toArray());
+        $includeUser = true;
+        return BookingResponseDTO::createFromBookingModel($booking, $includeUser);
+    }
+
     public function updateBookingStatus
     (BookingDTO $bookingDTO, int $businessId): BookingResponseDTO
     {
@@ -55,7 +65,11 @@ readonly class BookingService
         // TODO: VALIDACIONES DE USUARIO (Gerente)
         $this->serviceService->findById($businessId, $bookingDTO->serviceId);
         $booking = $this->getBookingModelWithUserOrFail($bookingDTO->bookingId);
-        $booking = $this->bookingRepository->updateBookingStatus($booking, $bookingDTO->toArray());
+
+        $data = $bookingDTO->toArray();
+        $data['user_id'] ??= $booking->user_id;
+        // Quitamos el user id por posible fuga de datos si introduciesen un id de user válido
+        $booking = $this->bookingRepository->updateBookingStatus($booking, $data);
 
         return BookingResponseDTO::createFromBookingModel($booking, $includeUser);
     }

@@ -42,7 +42,7 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
             startDate: $booking->start_date,
             endDate: $booking->end_date,
             status: $booking->status,
-            userResponse: $includeUser ? UserResponseDTO::createFromModel($booking->user) : null
+            userResponse: $includeUser && $booking->user ? UserResponseDTO::createFromModel($booking->user) : null
         );
     }
 

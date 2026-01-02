@@ -18,6 +18,7 @@ interface BookingRepositoryInterface
      * @return Array<stdClass>
      * */
     public function findAllByBusinessId(int $businessId): Collection;
+    public function create(array $data): Booking;
     public function updateBookingStatus(Booking $booking, array $data): Booking;
     public function assertExists(int $bookingId): bool;
 }

@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\DTO\Booking\BookingDTO;
-use App\DTO\Booking\BookingResponseDTO;
 use App\Enums\BookingStatus;
 use App\Exceptions\AppException;
 use App\Services\BookingService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class BookingController extends Controller
@@ -21,7 +24,16 @@ class BookingController extends Controller
 
     }
 
-    // TODO: Hacer un método para OBTENER RESERVAS QUE SE SOLAPEN
+    private const BOOKING_ATTRIBUTES = [
+        'start_date' => 'fecha de inicio',
+        'end_date' => 'fecha de fin',
+        'status' => 'estado'
+    ];
+
+    /* TODO: Hacer un método para OBTENER RESERVAS QUE SE SOLAPEN
+    *       Y el create también
+    */
+
     public function findAll(int $businessId, int $serviceId)
     {
         try {
@@ -50,21 +62,69 @@ class BookingController extends Controller
         }
     }
 
-    public function updateBookingStatus(int     $businessId, int $serviceId, int $bookingId,
-                                        Request $request)
+    // Me da que no se consumirá mediante endpoint,
+    // -> la consumirá el service de PreBooking al confirmar la PreReserva
+    public function create(int $businessId, int $serviceId, Request $request): JsonResponse
     {
         try {
-            $status = BookingStatus::from($request->get('status'));
-            $bookingDTO = BookingDTO::createFromArray($request->all(),
-                $serviceId, $bookingId, $status);
-
-            $bookingResp = $this->bookingService->updateBookingStatus($bookingDTO, $businessId);
+            $this->validateBookings($request, [
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after:start_date',
+            ]);
+            // TODO: SACAR EL ID DE LA SESIÓN
+            $userId = 1;
+            // El status por defecto en este punto será activa
+            $bookingDTO = BookingDTO::createFromArray($request->all(), $serviceId, BookingStatus::ACTIVA, null, $userId);
+            $bookingResp = $this->bookingService->create($businessId, $bookingDTO);
 
             return $this->ok($bookingResp);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
             return $this->internalError($th);
+        }
+    }
+
+    public function updateBookingStatus(int     $businessId, int $serviceId, int $bookingId,
+                                        Request $request)
+    {
+        try {
+            $this->validateBookings($request, [
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after:start_date',
+                'status' => ['required', new Enum(BookingStatus::class)],
+            ]);
+            $status = BookingStatus::from($request->get('status'));
+            $bookingDTO = BookingDTO::createFromArray($request->all(),
+                $serviceId, $status, $bookingId);
+
+            $bookingResp = $this->bookingService->updateBookingStatus($bookingDTO, $businessId);
+
+            return $this->ok($bookingResp);
+        } catch (ValidationException $th) {
+            return $this->error($th->validator->errors()->first());
+        } catch (AppException $th) {
+            return $this->error($th->getMessage(), $th->getStatusCode());
+        } catch (Throwable $th) {
+            return $this->internalError($th);
+        }
+    }
+
+    private function validateBookings(Request $request, array $rules): void
+    {
+        $validator = Validator::make(
+            $request->only(array_keys(self::BOOKING_ATTRIBUTES)),
+            $rules,
+            [
+                '*.required' => 'El campo :attribute es obligatorio.',
+                'end_date.after' => 'La fecha de fin debe ser posterior a la fecha de inicio.',
+                'status.enum' => 'El estado seleccionado no es válido.'
+            ],
+            self::BOOKING_ATTRIBUTES
+        );
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
         }
     }
 }

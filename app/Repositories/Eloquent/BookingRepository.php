@@ -44,6 +44,11 @@ class BookingRepository implements BookingRepositoryInterface
         return Booking::query()->with('user')->find($bookingId);
     }
 
+    public function create(array $data): Booking
+    {
+        return Booking::query()->create($data);
+    }
+
     public function updateBookingStatus(Booking $booking, array $data): Booking
     {
         $booking->update($data);
@@ -54,4 +59,5 @@ class BookingRepository implements BookingRepositoryInterface
     {
         return Booking::query()->where('id', $bookingId)->exists();
     }
+
 }
