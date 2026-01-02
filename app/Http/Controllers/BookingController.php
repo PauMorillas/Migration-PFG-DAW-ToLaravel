@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\DTO\Booking\BookingDTO;
-use App\DTO\Booking\BookingRequestDTO;
 use App\Enums\BookingStatus;
 use App\Exceptions\AppException;
 use App\Services\BookingService;
@@ -20,15 +19,12 @@ class BookingController extends Controller
 
     }
 
-    // TODO: OBTENER TODAS LAS RESERVAS, OBTENER RESERVAS QUE SE SOLAPEN
+    // TODO: Hacer un método para OBTENER RESERVAS QUE SE SOLAPEN
     public function findAll(int $businessId, int $serviceId)
     {
         try {
-            // TODO: Sacar el id del cliente de la sesión de sanctum
-            $userId = -1;
-            // TODO: Objeto de respuesta
-            $resp = $this->bookingService->findAll($businessId, $serviceId, $userId);
-            return $this->ok($resp);
+            $bookingResp = $this->bookingService->findAllByBusinessId($businessId, $serviceId);
+            return $this->ok($bookingResp);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
@@ -40,12 +36,11 @@ class BookingController extends Controller
                                         Request $request)
     {
         try {
-            $userId = 1;
             $status = BookingStatus::from($request->get('status'));
-            $bookingDTO = BookingDTO::createFromArray($request->all(), $serviceId, $userId, $bookingId, $status);
+            $bookingDTO = BookingDTO::createFromArray($request->all(),
+                $serviceId, $bookingId, $status);
 
-            var_dump($bookingDTO);
-            $bookingResp = $this->bookingService->updateBookingStatus($bookingDTO, $businessId, $serviceId, $userId, $bookingId);
+            $bookingResp = $this->bookingService->updateBookingStatus($bookingDTO, $businessId);
             return $this->ok($bookingResp);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());

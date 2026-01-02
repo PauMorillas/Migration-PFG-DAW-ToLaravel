@@ -20,7 +20,7 @@ readonly class BookingService
     public
     function findById(int $businessId, int $serviceId, int $userId, int $bookingId): BookingResponseDTO
     {
-        // TODO: VALIDACIONES DE USUARIO QUE SEGURAMENTE SE HAGAN EN EL FIND DE business
+        // TODO: VALIDACIONES DE USUARIO(GERENTE) QUE SEGURAMENTE SE HAGAN EN EL FIND DE business
         $this->assertExists($bookingId);
 
         $this->serviceService->findById($businessId, $serviceId);
@@ -33,12 +33,12 @@ readonly class BookingService
     }
 
     public
-    function findAll(int $businessId, int $serviceId, int $userId): array
+    function findAllByBusinessId(int $businessId, int $serviceId): array
     {
-        // TODO: VALIDACIONES DE USUARIO??
+        // TODO: VALIDACIONES DE USUARIO Gerente??
         $this->serviceService->findById($businessId, $serviceId);
 
-        $bookings = $this->bookingRepository->findAll($businessId);
+        $bookings = $this->bookingRepository->findAllByBusinessId($businessId);
 
         return $bookings->map(callback: function (Booking $booking) {
             return BookingResponseDTO::createFromBookingModel($booking, $booking->user);
@@ -50,14 +50,27 @@ readonly class BookingService
     // TODO: VAS POR AKI
     public function updateBookingStatus(BookingDTO $bookingDTO, int $businessId): BookingResponseDTO
     {
-        $booking = $this->findbyId($businessId, $bookingDTO->bookingId);
-        $this->bookingRepository->updateBookingStatus($booking);
-    }
+        // TODO: VALIDACIONES DE USUARIO (Gerente)
+        $this->serviceService->findById($businessId, $bookingDTO->serviceId);
+        $booking = $this->getBookingModelWithUserOrFail($bookingDTO->bookingId);
+        $booking = $this->bookingRepository->updateBookingStatus($booking, $bookingDTO->toArray());
 
+        return BookingResponseDTO::createFromBookingModel($booking, $booking->user);
+    }
 
     private
     function getBookingModelOrFail(int $bookingId): ?Booking
     {
+        $booking = $this->bookingRepository->findById($bookingId);
+
+        if (is_null($booking)) {
+            throw new BookingNotFoundException();
+        }
+
+        return $booking;
+    }
+
+    private function getBookingModelWithUserOrFail(int $bookingId): ?Booking {
         $booking = $this->bookingRepository->findById($bookingId);
 
         if (is_null($booking)) {

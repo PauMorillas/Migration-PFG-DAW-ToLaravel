@@ -23,7 +23,7 @@ class BookingRepository implements BookingRepositoryInterface
             ->get();
     }
 
-    public function findAll(int $businessId): Collection
+    public function findAllByBusinessId(int $businessId): Collection
     {
         // Eloquent ya sabe que id es el del usuario por los métodos
         // de las relaciones que se definen en el modelo
@@ -34,14 +34,20 @@ class BookingRepository implements BookingRepositoryInterface
             ->get();
     }
 
-    public function update(Booking $booking, array $data): Booking
-    {
-        // TODO: Implement update() method.
-    }
-
-    public function findById(int $bookingId): Booking
+    public function findById(int $bookingId): ?Booking
     {
         return Booking::query()->find($bookingId);
+    }
+
+    public function findByIdWithUser(int $bookingId): ?Booking
+    {
+        return Booking::query()->with('user')->find($bookingId);
+    }
+
+    public function updateBookingStatus(Booking $booking, array $data): Booking
+    {
+        $booking->update($data);
+        return $booking;
     }
 
     public function assertExists(int $bookingId): bool
