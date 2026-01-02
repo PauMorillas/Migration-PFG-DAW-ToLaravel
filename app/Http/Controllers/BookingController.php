@@ -30,6 +30,10 @@ class BookingController extends Controller
         'status' => 'estado'
     ];
 
+    private const BOOKING_UPDATE_ATTRIBUTES = [
+        'status' => 'estado'
+    ];
+
     /* TODO: Hacer un método para OBTENER RESERVAS QUE SE SOLAPEN
     *       Y el create también
     */
@@ -70,6 +74,7 @@ class BookingController extends Controller
             $this->validateBookings($request, [
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after:start_date',
+                'status' => ['required', new Enum(BookingStatus::class)],
             ]);
             // TODO: SACAR EL ID DE LA SESIÓN
             $userId = 1;
@@ -90,10 +95,8 @@ class BookingController extends Controller
     {
         try {
             $this->validateBookings($request, [
-                'start_date' => 'required|date',
-                'end_date' => 'required|date|after:start_date',
                 'status' => ['required', new Enum(BookingStatus::class)],
-            ]);
+            ], self::BOOKING_UPDATE_ATTRIBUTES);
             $status = BookingStatus::from($request->get('status'));
             $bookingDTO = BookingDTO::createFromArray($request->all(),
                 $serviceId, $status, $bookingId);
@@ -110,17 +113,18 @@ class BookingController extends Controller
         }
     }
 
-    private function validateBookings(Request $request, array $rules): void
+    private function validateBookings(Request $request, array $rules,
+                                      ?array  $attributes = self::BOOKING_ATTRIBUTES): void
     {
         $validator = Validator::make(
-            $request->only(array_keys(self::BOOKING_ATTRIBUTES)),
+            $request->only(array_keys($attributes)),
             $rules,
             [
                 '*.required' => 'El campo :attribute es obligatorio.',
                 'end_date.after' => 'La fecha de fin debe ser posterior a la fecha de inicio.',
                 'status.enum' => 'El estado seleccionado no es válido.'
             ],
-            self::BOOKING_ATTRIBUTES
+            $attributes
         );
 
         if ($validator->fails()) {
