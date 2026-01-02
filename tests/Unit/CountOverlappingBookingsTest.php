@@ -26,7 +26,7 @@ class CountOverlappingBookingsTest extends TestCase
                 null,
                 BookingStatus::ACTIVA
             ) // Parámetros que espera la función del should
-            ->once()
+            ->once() // Verifica que el mock fue llamado exactamente una vez - assertion 1
             ->andReturn(1);
 
         // Llamamos al método
@@ -37,7 +37,7 @@ class CountOverlappingBookingsTest extends TestCase
             status: BookingStatus::ACTIVA,
         );
 
-        // Afirma que devuelve lo que se simula en el test
+        // Afirma que devuelve lo que se simula en el test - assertion 2
         $this->assertEquals(1, $count);
     }
 }
