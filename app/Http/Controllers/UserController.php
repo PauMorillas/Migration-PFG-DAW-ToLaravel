@@ -48,7 +48,7 @@ class UserController extends Controller
     public function login(Request $request): JsonResponse
     {
         try {
-            $this->validate($request,
+            $this->validateUser($request,
                 [
                     'email' => 'required|email',
                     'password' => [
@@ -75,7 +75,7 @@ class UserController extends Controller
     public function register(Request $request): JsonResponse
     {
         try {
-            $this->validate($request,
+            $this->validateUser($request,
                 [
                     'name' => 'required|string|max:255',
                     'email' => 'required|email|unique:users,email',
@@ -112,7 +112,7 @@ class UserController extends Controller
     public function update(int $userId, Request $request): JsonResponse
     {
         try {
-            $this->validate($request,
+            $this->validateUser($request,
                 [
                     'name' => 'required|string|max:255',
                     'email' => [
@@ -168,7 +168,7 @@ class UserController extends Controller
         }
     }
 
-    private function validate(
+    private function validateUser(
         Request $request,
         array   $rules,
         array   $attributes): void

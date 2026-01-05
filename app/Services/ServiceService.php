@@ -50,10 +50,11 @@ readonly class ServiceService
         return ServiceResponse::createFromModel($service);
     }
 
-    public function create(CreateServiceDTO $dto): ?ServiceResponse
+    public function create(CreateServiceDTO $dto, int $authUserId): ?ServiceResponse
     {
         // REGLA DE NEGOCIO, para crear un servicio se debe tener primero un negocio asociado
         $this->businessService->assertExists($dto->businessId);
+        $this->businessService->assertUserCanModifyBusiness($dto->businessId, $authUserId);
 
         $service = $this->serviceRepository->create($dto->toArray());
 
@@ -61,7 +62,7 @@ readonly class ServiceService
     }
 
     public
-    function update(UpdateServiceDTO $dto): ?ServiceResponse
+    function update(UpdateServiceDTO $dto, int $authUserId): ?ServiceResponse
     {
         $this->businessService->assertExists($dto->businessId);
 
@@ -70,19 +71,23 @@ readonly class ServiceService
         // Si el negocio del dto es diferente al del service, se manda una excepción
         $this->assertServiceBelongsToBusiness($service, $dto->businessId);
 
+        $this->businessService->assertUserCanModifyBusiness($dto->businessId, $authUserId);
+
         $service = $this->serviceRepository->update($service, $dto->toArray());
 
         return ServiceResponse::createFromModel($service);
     }
 
     public
-    function delete(int $businessId, int $serviceId): bool
+    function delete(int $businessId, int $serviceId, int $authUserId): bool
     {
         $this->businessService->assertExists($businessId);
 
         $service = $this->getServiceModelOrFail($serviceId);
         // Si el negocio del dto es diferente al del service, se manda una excepción
         $this->assertServiceBelongsToBusiness($service, $businessId);
+
+        $this->businessService->assertUserCanModifyBusiness($businessId, $authUserId);
 
         $this->serviceRepository->delete($service);
 

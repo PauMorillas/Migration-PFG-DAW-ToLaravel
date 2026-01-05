@@ -61,7 +61,10 @@ class ServiceController extends Controller
         try {
             $this->validateService($request);
             $dto = CreateServiceDTO::createFromArray($request->all(), $businessId);
-            $serviceResp = $this->serviceService->create($dto);
+
+            $authUserId = $request->user()->id;
+
+            $serviceResp = $this->serviceService->create($dto, $authUserId);
 
             return $this->created($serviceResp);
         } catch (AppException $th) {
@@ -78,7 +81,10 @@ class ServiceController extends Controller
         try {
             $this->validateService($request);
             $dto = UpdateServiceDTO::createFromArray($request->all(), $id, $serviceId);
-            $serviceResp = $this->serviceService->update($dto);
+
+            $authUserId = $request->user()->id;
+
+            $serviceResp = $this->serviceService->update($dto, $authUserId);
 
             return $this->ok([$serviceResp]);
         } catch (AppException $th) {
@@ -90,10 +96,12 @@ class ServiceController extends Controller
         }
     }
 
-    public function delete(int $id, int $serviceId): JsonResponse
+    public function delete(int $id, int $serviceId, Request $request): JsonResponse
     {
         try {
-            $this->serviceService->delete($id, $serviceId);
+            $authUserId = $request->user()->id;
+
+            $this->serviceService->delete($id, $serviceId, $authUserId);
             return $this->noContent();
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
