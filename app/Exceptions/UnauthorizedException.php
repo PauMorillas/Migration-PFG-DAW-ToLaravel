@@ -12,6 +12,6 @@ class UnauthorizedException extends AppException
 
     public function __construct()
     {
-        parent::__construct('No puedes modificar datos en este negocio');
+        parent::__construct('No puedes modificar datos en este recurso');
     }
 }

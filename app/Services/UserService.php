@@ -7,6 +7,7 @@ use App\DTO\User\UpdateUserDTO;
 use App\DTO\User\UserLoginRequest;
 use App\DTO\User\UserResponseDTO;
 use App\Exceptions\InvalidCredentialsException;
+use App\Exceptions\UnauthorizedException;
 use App\Exceptions\UserNotFoundException;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
@@ -71,17 +72,20 @@ readonly class UserService
         return UserResponseDTO::createFromModel($user);
     }
 
-    public function delete(int $userId): void
+    public function delete(int $userId, int $authUserId): void
     {
         $user = $this->getUserModelOrFail($userId);
+        $this->assertIsOwner($userId, $authUserId);
 
         $this->userRepository->delete($user);
     }
 
-    public function update(UpdateUserDTO $dto): ?UserResponseDTO
+    public function update(UpdateUserDTO $dto, int $authUserId): ?UserResponseDTO
     {
         $data = $dto->toArray() + ['password' => Hash::make($dto->getPassword())];
+
         $user = $this->getUserModelOrFail($data['userId']);
+        $this->assertIsOwner($dto->userId, $authUserId);
 
         $this->userRepository->update($user, $data);
 
@@ -109,5 +113,12 @@ readonly class UserService
         }
 
         return true;
+    }
+
+    public function assertIsOwner(int $userId, int $authUserId): void
+    {
+        if ($userId !== $authUserId) {
+            throw new UnauthorizedException();
+        }
     }
 }

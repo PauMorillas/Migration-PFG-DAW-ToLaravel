@@ -134,8 +134,15 @@ class UserController extends Controller
                             ->numbers(),
                     ],
                 ], self::USER_ATTRIBUTES);
-            $dto = UpdateUserDTO::createFromArray($request->all(), $userId);
-            $userResp = $this->userService->update($dto);
+
+            // TODO: no se puede actualizar el rol, lo forzamos
+            $data = $request->only(['name','email','telephone','password']);
+            $data['role'] = 'CLIENTE';
+
+            $dto = UpdateUserDTO::createFromArray($data, $userId);
+
+            $authUserId = $request->user()->id;
+            $userResp = $this->userService->update($dto, $authUserId);
 
             return $this->ok($userResp);
         } catch (ValidationException $th) {
@@ -147,10 +154,11 @@ class UserController extends Controller
         }
     }
 
-    public function delete(int $userId): JsonResponse
+    public function delete(int $userId, Request $request): JsonResponse
     {
         try {
-            $this->userService->delete($userId);
+            $authUserId = $request->user()->id;
+            $this->userService->delete($userId, $authUserId);
 
             return $this->noContent();
         } catch (AppException $th) {

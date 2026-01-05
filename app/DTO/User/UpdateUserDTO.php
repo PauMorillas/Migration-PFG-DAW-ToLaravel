@@ -11,7 +11,7 @@ use App\DTO\User\BaseUserDTO;
 class UpdateUserDTO extends BaseUserDTO implements Arrayable, JsonSerializable
 {
     public function __construct(
-        protected string $userId,
+        public readonly string $userId,
         protected string $name,
         protected string $email,
         protected ?string $password,
