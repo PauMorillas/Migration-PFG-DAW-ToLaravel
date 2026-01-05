@@ -22,7 +22,7 @@ final class UpdateBusinessDTO extends BaseBusinessDTO
     }
 
 
-    public static function createFromArray(array $data, int $businessId): self
+    public static function createFromArray(array $data, int $businessId, int $userId): self
     {
         return new self(
             $businessId,
@@ -32,7 +32,7 @@ final class UpdateBusinessDTO extends BaseBusinessDTO
             $data['open_hours'],
             $data['close_hours'],
             $data['open_days'],
-            $data['user_id']
+            $userId
         );
     }
 

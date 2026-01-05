@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\DTO\Business\UpdateBusinessDTO;
@@ -19,14 +20,15 @@ class BusinessController extends Controller
     use ApiResponseTrait;
 
     public function __construct(private readonly BusinessService $businessService)
-    {}
+    {
+    }
 
     public function findById(int $businessId): JsonResponse
     {
         try {
             $businessResp = $this->businessService->findById($businessId);
 
-            return $this->ok([$businessResp]);
+            return $this->ok($businessResp);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
@@ -37,13 +39,17 @@ class BusinessController extends Controller
     public function create(Request $request): JsonResponse
     {
         try {
+            $userId = $request->user()->id;
+
             $this->validateBusiness($request);
-            $dto = CreateBusinessDTO::createFromArray($request->all());
+            $dto = CreateBusinessDTO::createFromArray($request->all(), $userId);
             $businessResp = $this->businessService->create($dto);
 
             return $this->created($businessResp);
         } catch (ValidationException $ex) {
             return $this->validationError($ex->validator->errors()->first());
+        } catch (AppException $th) {
+            return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
             return $this->internalError($th);
         }
@@ -52,25 +58,29 @@ class BusinessController extends Controller
     public function update(int $businessId, Request $request): JsonResponse
     {
         try {
+            $userId = $request->user()->id;
+
             $this->validateBusiness($request);
-            $dto = UpdateBusinessDTO::createFromArray($request->all(), $businessId);
+            $dto = UpdateBusinessDTO::createFromArray($request->all(), $businessId, $userId);
             $businessResp = $this->businessService->update($dto);
 
-            return $this->ok([$businessResp]);
-        } catch (AppException $th) {
-            return $this->error($th->getMessage(), $th->getStatusCode());
+            return $this->ok($businessResp);
         } catch (ValidationException $ex) {
             return $this->validationError($ex->validator->errors()->first());
+        } catch (AppException $th) {
+            return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
             return $this->internalError($th);
         }
     }
 
     // Hace un soft delete
-    public function delete(int $businessId): JsonResponse
+    public function delete(int $businessId, Request $request): JsonResponse
     {
         try {
-            $this->businessService->delete($businessId);
+            $userId = $request->user()->id;
+
+            $this->businessService->delete($businessId, $userId);
             return $this->noContent();
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());

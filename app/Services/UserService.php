@@ -29,7 +29,7 @@ readonly class UserService
         return UserResponseDTO::createFromModel($user);
     }
 
-    public function login(UserLoginRequest $dto): ?UserResponseDTO
+    /*public function login(UserLoginRequest $dto): ?UserResponseDTO
     {
         $user = $this->userRepository->findByEmail(
             $dto->getEmail());
@@ -43,6 +43,24 @@ readonly class UserService
         }
 
         return UserResponseDTO::createFromModel($user);
+    }*/
+    public function login(UserLoginRequest $dto): array
+    {
+        $user = $this->userRepository->findByEmail(
+            $dto->getEmail());
+
+        if (is_null($user)) {
+            throw new UserNotFoundException();
+        }
+
+        if (!Hash::check($dto->getPassword(), $user->password)) {
+            throw new InvalidCredentialsException();
+        }
+
+        return [
+            'user' => UserResponseDTO::createFromModel($user),
+            'token' => $user->createToken('api-token')->plainTextToken,
+        ];
     }
 
     public function register(CreateUserDTO $dto): ?UserResponseDTO
@@ -92,5 +110,4 @@ readonly class UserService
 
         return true;
     }
-
 }

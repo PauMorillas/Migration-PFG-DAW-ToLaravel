@@ -91,6 +91,7 @@ class PreBookingController extends Controller
         }
     }
 
+    //TODO: No parece necesario este método
     public function update(int $businessId, int $serviceId, int $bookingId): JsonResponse
     {
         return $this->noContent();

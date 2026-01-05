@@ -16,13 +16,13 @@ final class CreateBusinessDTO extends BaseBusinessDTO
         string               $openHours,
         string               $closeHours,
         string               $openDays,
-        public readonly int  $userId
+        public readonly ?int  $userId
     )
     {
         parent::__construct($name, $email, $phone, $openHours, $closeHours, $openDays);
     }
 
-    public static function createFromArray(array $data): self
+    public static function createFromArray(array $data, ?int $userId = null): self
     {
         return new self(
             null,
@@ -32,7 +32,7 @@ final class CreateBusinessDTO extends BaseBusinessDTO
             $data['open_hours'],
             $data['close_hours'],
             $data['open_days'],
-            $data['user_id']
+            $userId
         );
     }
 

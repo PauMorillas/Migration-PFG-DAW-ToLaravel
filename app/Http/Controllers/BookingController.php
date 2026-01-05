@@ -11,7 +11,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -83,6 +82,8 @@ class BookingController extends Controller
             $bookingResp = $this->bookingService->create($businessId, $bookingDTO);
 
             return $this->ok($bookingResp);
+        } catch (ValidationException $th) {
+            return $this->error($th->validator->errors()->first());
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {

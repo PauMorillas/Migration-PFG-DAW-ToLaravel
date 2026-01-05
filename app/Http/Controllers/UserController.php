@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\DTO\User\CreateUserDTO;
 use App\DTO\User\UpdateUserDTO;
 use App\DTO\User\UserLoginRequest;
+use App\DTO\User\UserResponseDTO;
 use App\Exceptions\AppException;
 use App\Traits\ApiResponseTrait;
 use App\Services\UserService;
@@ -100,6 +101,12 @@ class UserController extends Controller
         } catch (Throwable $th) {
             return $this->internalError($th);
         }
+    }
+
+    public function me(Request $request): JsonResponse
+    {
+        $user = UserResponseDTO::createFromModel($request->user());
+        return $this->ok($user); // Obtiene el usuario que hace la request
     }
 
     public function update(int $userId, Request $request): JsonResponse

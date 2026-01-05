@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\DTO\Business\BusinessResponse;
+use App\Exceptions\UnauthorizedException;
+use App\Exceptions\UserNotFoundException;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Bus;
 use App\Models\Business;
@@ -32,8 +34,7 @@ readonly class BusinessService
 
     public function create(CreateBusinessDTO $dto): ?BusinessResponse
     {
-        // TODO: Buscar si existe una sesión o un usuario con ese negocio asociado
-        /* $this->userService->assertExists($dto->userId); */
+        $this->userService->assertExists($dto->userId);
 
         $business = $this->businessRepository->create($dto->toArray());
 
@@ -42,6 +43,8 @@ readonly class BusinessService
 
     public function update(UpdateBusinessDTO $dto): ?BusinessResponse
     {
+        $this->assertUserCanModifyBusiness($dto->businessId, $dto->userId);
+
         $business = $this->getBusinessModelOrFail($dto->businessId);
 
         $businessUpdt = $this->businessRepository->update($business, $dto->toArray());
@@ -49,9 +52,11 @@ readonly class BusinessService
         return BusinessResponse::createFromModel($businessUpdt);
     }
 
-    public function delete($id): bool
+    public function delete(int $businessId, int $userId): bool
     {
-        $business = $this->getBusinessModelOrFail($id);
+        $this->assertUserCanModifyBusiness($businessId, $userId);
+
+        $business = $this->getBusinessModelOrFail($userId);
 
         $this->businessRepository->delete($business);
         return true;
@@ -71,9 +76,9 @@ readonly class BusinessService
     /** Lo usan las funciones del servicio de servicios
      * para validar existencia en vez de devolver entidad y checkear
      * */
-    public function assertExists(int $id): bool
+    public function assertExists(int $businessId): bool
     {
-        $exists = $this->businessRepository->assertExists($id);
+        $exists = $this->businessRepository->assertExists($businessId);
 
         if (is_null($exists) || !$exists) {
             throw new BusinessNotFoundException();
@@ -82,4 +87,21 @@ readonly class BusinessService
         return $exists;
     }
 
+    public function assertUserCanModifyBusiness(int $businessId, int $userId): void
+    {
+        $user = $this->userService->findById($userId);
+        $business = $this->businessRepository->findById($businessId);
+
+        if(!$user) {
+            throw new UserNotFoundException();
+        }
+
+        if (!$business) {
+            throw new BusinessNotFoundException();
+        }
+
+        if ($business->user_id !== $userId) {
+            throw new UnauthorizedException();
+        }
+    }
 }
