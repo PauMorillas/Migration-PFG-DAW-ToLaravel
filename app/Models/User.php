@@ -43,7 +43,7 @@ class User extends Authenticatable
         return $this->role === 'GERENTE';
     }
 
-    public function isCliente(): bool
+    public function isCliente(): ?bool
     {
         return $this->role === 'CLIENTE';
     }

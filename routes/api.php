@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ApiAuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ServiceController;
@@ -18,25 +17,35 @@ Route::prefix('users')->group(function () {
 // ==== Rutas para la entidad Business ====
 Route::prefix('businesses')->group(function () {
     Route::get('/{businessId}', [BusinessController::class, 'findById'])
-        ->whereNumber('businessId'); // TODO: Preguntar si esta validacion debe ir aquí
+        ->whereNumber('businessId'); // TODO: Preguntar si esta validación debe ir aquí
 
-    // === Rutas de servicios (1-N Desde negocio) ===
+    // === Rutas de Services (1-N Desde negocio) ===
     Route::get('{businessId}/services', [ServiceController::class, 'findAll'])
         ->whereNumber('businessId');
     Route::get('{businessId}/services/{serviceId}', [ServiceController::class, 'findById'])
         ->whereNumber('businessId');
 
-    // === Rutas de PreReservas (1-N desde Servicio) - (Pueden ser Públicas) ===
-    Route::get('{businessId}/services/{serviceId}/bookings',[PreBookingController::class, 'findAll'])
+    // === Rutas de PreBooking (1-N desde Servicio) - (Pueden ser Públicas) ===
+    Route::get('{businessId}/services/{serviceId}/bookings', [PreBookingController::class, 'findAll'])
         ->whereNumber(['businessId', 'serviceId']);
-    Route::get('{businessId}/services/{serviceId}/bookings/{bookingId}',[PreBookingController::class, 'findById'])
+    Route::get('{businessId}/services/{serviceId}/bookings/{bookingId}', [PreBookingController::class, 'findById'])
         ->whereNumber(['businessId', 'serviceId', 'bookingId']);
-    Route::post('{businessId}/services/{serviceId}/bookings',[PreBookingController::class, 'create'])
+    Route::post('{businessId}/services/{serviceId}/bookings', [PreBookingController::class, 'create'])
         ->whereNumber(['businessId', 'serviceId']);
-    Route::delete('{businessId}/services/{serviceId}/bookings/{bookingId}',[PreBookingController::class, 'delete'])
+    Route::delete('{businessId}/services/{serviceId}/bookings/{bookingId}', [PreBookingController::class, 'delete'])
         ->whereNumber(['businessId', 'serviceId', 'bookingId']);
-    Route::put('{businessId}/services/{serviceId}/bookings/{bookingId}',[PreBookingController::class, 'update'])
+    Route::put('{businessId}/services/{serviceId}/bookings/{bookingId}', [PreBookingController::class, 'update'])
         ->whereNumber(['businessId', 'serviceId', 'bookingId']);
+
+    // === Rutas de Bookings ===
+    Route::middleware('auth.optional')->group(function () {
+        Route::prefix('{businessId}/services/{serviceId}/bookings')->group(function () {
+            Route::get('{bookingId}/v2', [BookingController::class, 'findById'])
+                ->whereNumber(['businessId', 'serviceId', 'bookingId']);
+            Route::get('/v2', [BookingController::class, 'findAll'])
+                ->whereNumber(['businessId', 'serviceId']);
+        });
+    });
 });
 
 // === Rutas Protegidas (CON AUTH) ===
@@ -70,16 +79,9 @@ Route::middleware('auth:sanctum')->group(function () {
             ->whereNumber('businessId');
 
         Route::prefix('{businessId}/services/{serviceId}/bookings')->group(function () {
-            // === Rutas de Reservas (1-1 con User) (1-N desde Servicio) ===
-            Route::get('/v2', [BookingController::class, 'findAll'])
-                ->whereNumber(['businessId', 'serviceId']);
-
+            // === Rutas de Bookings (1-1 con User) (1-N desde Services) ===
             Route::post('/v2', [BookingController::class, 'create'])
                 ->whereNumber(['businessId', 'serviceId']);
-
-            Route::get('{bookingId}/v2', [BookingController::class, 'findById'])
-                ->whereNumber(['businessId', 'serviceId', 'bookingId']);
-
             Route::patch('{bookingId}/v2', [BookingController::class, 'updateBookingStatus'])
                 ->whereNumber(['businessId', 'serviceId', 'bookingId']);
         });

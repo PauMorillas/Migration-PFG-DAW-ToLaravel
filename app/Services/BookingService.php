@@ -12,14 +12,14 @@ use App\Repositories\Contracts\BookingRepositoryInterface;
 readonly class BookingService
 {
     public function __construct(private BookingRepositoryInterface $bookingRepository,
-                                private ServiceService             $serviceService)
+                                private ServiceService             $serviceService,
+                                private BusinessService            $businessService)
     {
     }
 
     public function findById(int $businessId, int $serviceId,
-                             int $userId, int $bookingId, bool $includeUser): BookingResponseDTO
+                             int $bookingId, bool $includeUser): BookingResponseDTO
     {
-        // TODO: VALIDACIONES DE USUARIO(GERENTE) QUE SEGURAMENTE SE HAGAN EN EL FIND DE business
         $this->assertExists($bookingId);
 
         $this->serviceService->findById($businessId, $serviceId);
@@ -33,25 +33,23 @@ readonly class BookingService
         return BookingResponseDTO::createFromBookingModel($booking, $includeUser);
     }
 
-    public function findAllByBusinessId(int $businessId, int $serviceId): array
+    public function findAllByBusinessId(int $businessId, int $serviceId, bool $includeUser): array
     {
-        // TODO: VALIDACIONES DE USUARIO Gerente??
         $this->serviceService->findById($businessId, $serviceId);
 
         $bookings = $this->bookingRepository->findAllByBusinessId($businessId);
 
-        return $bookings->map(callback: function (Booking $booking) {
-            $includeUser = true;
+        return $bookings->map(callback: function (Booking $booking) use ($includeUser) {
             return BookingResponseDTO::createFromBookingModel($booking, $includeUser);
             // Para acceder a una entidad de eloquent (que tenga relaciones definidas)
             // se hace como si fuese una propiedad
         })->toArray();
     }
 
-    // todo: sacar el idCliente de la sesión
     public function create(int $businessId, BookingDTO $bookingDTO): BookingResponseDTO
     {
         $this->serviceService->findById($businessId, $bookingDTO->serviceId);
+        $this->businessService->assertUserCanModifyBusiness($businessId, $bookingDTO->userId);
 
         $booking = $this->bookingRepository->create($bookingDTO->toArray());
         $includeUser = true;
@@ -59,13 +57,12 @@ readonly class BookingService
     }
 
     public function updateBookingStatus
-    (BookingDTO $bookingDTO, int $businessId): BookingResponseDTO
+    (BookingDTO $bookingDTO, int $businessId, bool $includeUser): BookingResponseDTO
     {
-        $includeUser = true;
-        // TODO: VALIDACIONES DE USUARIO (Gerente)
         $this->serviceService->findById($businessId, $bookingDTO->serviceId);
-        $booking = $this->getBookingModelWithUserOrFail($bookingDTO->bookingId);
+        $this->businessService->assertUserCanModifyBusiness($businessId, $bookingDTO->userId);
 
+        $booking = $this->getBookingModelWithUserOrFail($bookingDTO->bookingId);
         $data = $bookingDTO->toArray();
         // Actualizaremos SOLO el estado
         $updateData = ['status' => $data['status']];

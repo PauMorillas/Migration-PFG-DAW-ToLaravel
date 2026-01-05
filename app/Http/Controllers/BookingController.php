@@ -36,11 +36,13 @@ class BookingController extends Controller
     /* TODO: Hacer un método para OBTENER RESERVAS QUE SE SOLAPEN
     *       Y el create también
     */
-
-    public function findAll(int $businessId, int $serviceId)
+    public function findAll(int $businessId, int $serviceId, Request $request): JsonResponse
     {
         try {
-            $bookingResp = $this->bookingService->findAllByBusinessId($businessId, $serviceId);
+            $user = $request->user(); // null si no hay token
+            $isGerente = $user?->isGerente() ?? false;
+            var_dump($isGerente);
+            $bookingResp = $this->bookingService->findAllByBusinessId($businessId, $serviceId, $isGerente);
 
             return $this->ok($bookingResp);
         } catch (AppException $th) {
@@ -50,12 +52,12 @@ class BookingController extends Controller
         }
     }
 
-    public function findById(int $businessId, int $serviceId, int $bookingId): JsonResponse
+    public function findById(int $businessId, int $serviceId, int $bookingId, Request $request): JsonResponse
     {
         try {
-            $isGerente = true; // TODO: Esto el dia de mañana saldrá de auth
-            $userId = 0; // TODO: Sacar el id de la Sesión
-            $bookingResp = $this->bookingService->findById($businessId, $serviceId, $userId, $bookingId, $isGerente);
+            $user = $request->user(); // null si no hay token
+            $isGerente = $user?->isGerente() ?? false;
+            $bookingResp = $this->bookingService->findById($businessId, $serviceId, $bookingId, $isGerente);
 
             return $this->ok($bookingResp);
         } catch (AppException $th) {
@@ -75,10 +77,10 @@ class BookingController extends Controller
                 'end_date' => 'required|date|after:start_date',
                 'status' => ['required', new Enum(BookingStatus::class)],
             ]);
-            // TODO: SACAR EL ID DE LA SESIÓN
-            $userId = 1;
+            $userId = $request->user()->id;
             // El status por defecto en este punto será activa
-            $bookingDTO = BookingDTO::createFromArray($request->all(), $serviceId, BookingStatus::ACTIVA, null, $userId);
+            $bookingDTO = BookingDTO::createFromArray($request->all(), $serviceId,
+                BookingStatus::ACTIVA, null, $userId);
             $bookingResp = $this->bookingService->create($businessId, $bookingDTO);
 
             return $this->ok($bookingResp);
@@ -99,10 +101,14 @@ class BookingController extends Controller
                 'status' => ['required', new Enum(BookingStatus::class)],
             ], self::BOOKING_UPDATE_ATTRIBUTES);
             $status = BookingStatus::from($request->get('status'));
-            $bookingDTO = BookingDTO::createFromArray($request->all(),
-                $serviceId, $status, $bookingId);
 
-            $bookingResp = $this->bookingService->updateBookingStatus($bookingDTO, $businessId);
+            $isGerente = $request->user()->isGerente();
+            $userId = $request->user()->id;
+
+            $bookingDTO = BookingDTO::createFromArray($request->all(),
+                $serviceId, $status, $bookingId, $userId);
+
+            $bookingResp = $this->bookingService->updateBookingStatus($bookingDTO, $businessId, $isGerente);
 
             return $this->ok($bookingResp);
         } catch (ValidationException $th) {
