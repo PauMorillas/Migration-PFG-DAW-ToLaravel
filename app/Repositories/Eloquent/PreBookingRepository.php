@@ -33,16 +33,31 @@ class PreBookingRepository implements PreBookingRepositoryInterface
         $preBooking->delete();
     }
 
-    // TODO: METODO PARA CONFIRMAR UNA RESERVA
-    public function findByToken(): ?PreBooking
+    public function findByToken(string $token): ?PreBooking
     {
-        // TODO: Implement findbyToken() method.
+        return PreBooking::query()
+            ->where('token', $token)
+            ->first();
     }
 
-    public function countOverlappingPreReserva(): ?PreBooking
+    public function countOverlappingPreBooking(int $serviceId,
+                                               string $startDate,
+                                               string $endDate,
+                                               ?int $ignorePreBookingId): ?int
     {
-        // TODO: Implement countOverlappingPreReserva() method.
-    }
+        $query = DB::table('pre_bookings')
+            ->where('service_id', $serviceId)
+            ->where('start_date', '<' , $endDate)
+            ->where('end_date', '>' , $startDate)
+            // No contamos con las PreReservas expiradas ni con las eliminadas
+            ->where('expiration_date', '>', now())
+            ->whereNull('deleted_at');
 
+        if ($ignorePreBookingId) {
+            $query->where('id', '!=', $ignorePreBookingId);
+        }
+
+        return $query->count();
+    }
 
 }

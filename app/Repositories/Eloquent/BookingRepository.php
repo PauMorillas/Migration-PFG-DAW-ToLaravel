@@ -68,7 +68,9 @@ class BookingRepository implements BookingRepositoryInterface
             ->where('service_id', $serviceId)
             ->where('start_date', '<', $endDate)
             ->where('end_date', '>', $startDate)
-            ->where('status', '=', $status->value);
+            ->where('status', '=', $status->value)
+            // No contaremos las que fueron eliminadas
+            ->where('deleted_at', '=', null);
 
         if ($ignoreBookingId !== null) {
             $query->where('id', '!=', $ignoreBookingId);

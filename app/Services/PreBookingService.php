@@ -5,7 +5,9 @@ namespace App\Services;
 use App\DTO\Booking\BookingRequestDTO;
 use App\DTO\Booking\BookingResponseDTO;
 use App\Exceptions\BookingNotFoundException;
+use App\Exceptions\PreBookingExpiredException;
 use App\Models\PreBooking;
+use App\Repositories\Contracts\BookingRepositoryInterface;
 use App\Repositories\Contracts\PreBookingRepositoryInterface;
 use App\Exceptions\BookingDoesntBelongToServiceException;
 use Nette\Utils\Random;
@@ -14,12 +16,19 @@ use stdClass;
 
 readonly class PreBookingService
 {
-    public function __construct(private PreBookingRepositoryInterface $bookingRepository,
+    public function __construct(private PreBookingRepositoryInterface $preBookingRepository,
+                                private BookingRepositoryInterface    $bookingRepository,
                                 private ServiceService                $serviceService,
                                 private BusinessService               $businessService)
     {
     }
+
     private const BOOKING_EXPIRATION_MINS = 30;
+
+    private const NECESSARY_BOOKING_ATTRIBUTES = [
+        'start_date' => 'fecha de inicio',
+        'end_date' => 'fecha de fin',
+    ];
 
     public function findById(int $businessId, int $serviceId, int $bookingId, bool $includeUser): ?BookingResponseDTO
     {
@@ -39,7 +48,7 @@ readonly class PreBookingService
         $this->businessService->assertExists($businessId);
         $this->serviceService->assertExists($serviceId);
 
-        $preBookings = $this->bookingRepository->findAll($businessId);
+        $preBookings = $this->preBookingRepository->findAll($businessId);
 
         return $preBookings->map(function (stdClass $preBooking) use ($includeUser) {
             return BookingResponseDTO::createFromStdClass($preBooking, $includeUser);
@@ -56,7 +65,7 @@ readonly class PreBookingService
                 'expiration_date' => now()->addMinutes(self::BOOKING_EXPIRATION_MINS),
             ];
 
-        $preBooking = $this->bookingRepository->create($payload);
+        $preBooking = $this->preBookingRepository->create($payload);
 
         return BookingResponseDTO::createFromPreBookingModel($preBooking);
     }
@@ -70,14 +79,41 @@ readonly class PreBookingService
 
         $this->assertPreBookingBelongsToService($preBooking, $serviceId);
 
-        $this->bookingRepository->delete($preBooking);
+        $this->preBookingRepository->delete($preBooking);
 
         return true;
     }
 
+    // TODO: Necesitamos recuperar el id del usuario si no viene de la request (seguramente no por la implementacion de JS)
+    // Posible solución-> buscar el usuario con el correo de la prebooking y coger ese id para hacer la relacion en bd
+    private function confirmPreBooking(int $serviceId, int $userId, string $token): BookingResponseDTO
+    {
+        $preBooking = $this->preBookingRepository->findByToken($token);
+
+        if (is_null($preBooking)) {
+            throw new BookingNotFoundException();
+        }
+        // Si el tiempo de reserva ha expirado se manda una excepción
+        if ($preBooking->expiration_date->isPast()) {
+            $this->deleteByPreBookingModel($preBooking);
+            throw new PreBookingExpiredException();
+        }
+
+        // Una vez validado se guarda una booking
+        $bookingData = $preBooking->only(array_keys(self::NECESSARY_BOOKING_ATTRIBUTES));
+        $bookingData += [
+            'service_id' => $serviceId,
+            'user_id' => $userId,
+        ];
+
+        $this->bookingRepository->create($bookingData);
+
+        return BookingResponseDTO::createFromPreBookingModel($preBooking);
+    }
+
     private function getPreBookingModelOrFail(int $bookingId): PreBooking
     {
-        $preBooking = $this->bookingRepository->findById($bookingId);
+        $preBooking = $this->preBookingRepository->findById($bookingId);
 
         if (is_null($preBooking)) {
             throw new BookingNotFoundException();
@@ -98,17 +134,14 @@ readonly class PreBookingService
         try {
             $bytes = random_bytes(20);
         } catch (RandomException) {
-            $this->generateRandomToken();
+            return $this->generateRandomToken();
         }
         /*var_dump(bin2hex($bytes));*/
         return bin2hex($bytes);
     }
 
-    // TODO: Validar que el tiempo para aceptar la PreRseserva no expiró
-    /* private function validateExpiredPrebooking(): boolean {
-        if($preBooking->expiration_date->isPast()) {
-            throw new PreBookingExpiredException();
-        }
-    } */
+    private function deleteByPreBookingModel(PreBooking $preBooking): void {
+        $this->preBookingRepository->delete($preBooking);
+    }
 
 }
