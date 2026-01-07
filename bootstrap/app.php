@@ -17,12 +17,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
-        $middleware->alias('auth.optional', OptionalSanctumAuth::class);
+        $middleware->alias([
+            'auth.optional' => OptionalSanctumAuth::class,
+        ]);
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
-            OptionalSanctumAuth::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

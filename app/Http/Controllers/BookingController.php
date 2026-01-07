@@ -41,7 +41,7 @@ class BookingController extends Controller
         try {
             $user = $request->user(); // null si no hay token
             $isGerente = $user?->isGerente() ?? false;
-            var_dump($isGerente);
+
             $bookingResp = $this->bookingService->findAllByBusinessId($businessId, $serviceId, $isGerente);
 
             return $this->ok($bookingResp);
@@ -57,8 +57,8 @@ class BookingController extends Controller
         try {
             $user = $request->user(); // null si no hay token
             $isGerente = $user?->isGerente() ?? false;
-            $bookingResp = $this->bookingService->findById($businessId, $serviceId, $bookingId, $isGerente);
 
+            $bookingResp = $this->bookingService->findById($businessId, $serviceId, $bookingId, $isGerente);
             return $this->ok($bookingResp);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
