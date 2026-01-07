@@ -25,20 +25,18 @@ Route::prefix('businesses')->group(function () {
     Route::get('{businessId}/services/{serviceId}', [ServiceController::class, 'findById'])
         ->whereNumber('businessId');
 
-    // === Rutas de PreBooking (1-N desde Servicio) - (Pueden ser Públicas) ===
-    Route::get('{businessId}/services/{serviceId}/bookings', [PreBookingController::class, 'findAll'])
-        ->whereNumber(['businessId', 'serviceId']);
-    Route::get('{businessId}/services/{serviceId}/bookings/{bookingId}', [PreBookingController::class, 'findById'])
-        ->whereNumber(['businessId', 'serviceId', 'bookingId']);
-    Route::post('{businessId}/services/{serviceId}/bookings', [PreBookingController::class, 'create'])
-        ->whereNumber(['businessId', 'serviceId']);
-    Route::delete('{businessId}/services/{serviceId}/bookings/{bookingId}', [PreBookingController::class, 'delete'])
-        ->whereNumber(['businessId', 'serviceId', 'bookingId']);
-    Route::put('{businessId}/services/{serviceId}/bookings/{bookingId}', [PreBookingController::class, 'update'])
-        ->whereNumber(['businessId', 'serviceId', 'bookingId']);
-
-    // === Rutas de Bookings ===
+    // === Rutas con Autorización Opcional ===
     Route::middleware('auth.optional')->group(function () {
+
+        // === Rutas de PreBooking (1-N desde Servicio) ===
+        Route::get('{businessId}/services/{serviceId}/bookings', [PreBookingController::class, 'findAll'])
+            ->whereNumber(['businessId', 'serviceId']);
+        Route::get('{businessId}/services/{serviceId}/bookings/{bookingId}', [PreBookingController::class, 'findById'])
+            ->whereNumber(['businessId', 'serviceId', 'bookingId']);
+        /*Route::put('{businessId}/services/{serviceId}/bookings/{bookingId}', [PreBookingController::class, 'update'])
+            ->whereNumber(['businessId', 'serviceId', 'bookingId']);*/
+
+        // === Rutas de Bookings ===
         Route::prefix('{businessId}/services/{serviceId}/bookings')->group(function () {
             Route::get('{bookingId}/v2', [BookingController::class, 'findById'])
                 ->whereNumber(['businessId', 'serviceId', 'bookingId']);
@@ -85,5 +83,11 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::patch('{bookingId}/v2', [BookingController::class, 'updateBookingStatus'])
                 ->whereNumber(['businessId', 'serviceId', 'bookingId']);
         });
+
+        // Rutas de PreBookings Privadas
+        Route::post('{businessId}/services/{serviceId}/bookings', [PreBookingController::class, 'create'])
+            ->whereNumber(['businessId', 'serviceId']);
+        Route::delete('{businessId}/services/{serviceId}/bookings/{bookingId}', [PreBookingController::class, 'delete'])
+            ->whereNumber(['businessId', 'serviceId', 'bookingId']);
     });
 });

@@ -3,9 +3,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PreBooking extends Model
 {
+    use SoftDeletes;
+
     // Esta entidad no usará safe deletes
     protected $table = 'pre_bookings';
 

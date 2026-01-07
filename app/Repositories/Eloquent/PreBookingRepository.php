@@ -33,6 +33,7 @@ class PreBookingRepository implements PreBookingRepositoryInterface
         $preBooking->delete();
     }
 
+    // TODO: METODO PARA CONFIRMAR UNA RESERVA
     public function findByToken(): ?PreBooking
     {
         // TODO: Implement findbyToken() method.

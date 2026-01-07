@@ -18,19 +18,24 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
                                 private int              $serviceId,
                                 private string           $startDate,
                                 private string           $endDate,
-                                private ?BookingStatus          $status = null,
+                                private ?BookingStatus   $status = null,
                                 private ?UserResponseDTO $userResponse = null,)
     {
 
     }
 
-    public static function createFromPreBookingModel(PreBooking $booking): self
+    public static function createFromPreBookingModel(PreBooking $booking, ?bool $includeUser = false): self
     {
         return new self(
             bookingId: $booking->id,
             serviceId: $booking->service_id,
             startDate: $booking->start_date,
             endDate: $booking->end_date,
+            status: null,
+            userResponse: $includeUser && $booking->user
+                ? UserResponseDTO::createFromPreBooking($booking->user_name,
+                    $booking->user_email, $booking->user_phone)
+                : null
         );
     }
 
@@ -42,18 +47,23 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
             startDate: $booking->start_date,
             endDate: $booking->end_date,
             status: $booking->status,
-            userResponse: $includeUser && $booking->user ? UserResponseDTO::createFromModel($booking->user) : null
+            userResponse: $includeUser && $booking->user
+                ? UserResponseDTO::createFromModel($booking->user)
+                : null
         );
     }
 
-    public static function createFromStdClass(stdClass $row): self
+    public static function createFromStdClass(stdClass $row, bool $includeUser): self
     {
         return new self(
             $row->id,
             $row->service_id,
             $row->start_date,
             $row->end_date,
-            $row->status,
+            null,
+            userResponse: $includeUser && $row->user_email
+                ? UserResponseDTO::createFromStdClass($row)
+                : null
         );
     }
 

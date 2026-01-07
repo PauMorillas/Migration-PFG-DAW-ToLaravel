@@ -102,7 +102,8 @@ class BookingController extends Controller
             ], self::BOOKING_UPDATE_ATTRIBUTES);
             $status = BookingStatus::from($request->get('status'));
 
-            $isGerente = $request->user()->isGerente();
+            $user = $request->user();
+            $isGerente = $user?->isGerente() ?? false;
             $userId = $request->user()->id;
 
             $bookingDTO = BookingDTO::createFromArray($request->all(),

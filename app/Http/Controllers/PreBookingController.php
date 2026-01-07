@@ -32,10 +32,13 @@ class PreBookingController extends Controller
         'user_pass' => 'contraseña',
     ];
 
-    public function findById(int $businessId, int $serviceId, int $bookingId): JsonResponse
+    public function findById(int $businessId, int $serviceId, int $bookingId, Request $request): JsonResponse
     {
         try {
-            $bookingResp = $this->bookingService->findbyId($businessId, $serviceId, $bookingId);
+            $user = $request->user();
+            $isGerente = $user?->isGerente() ?? false;
+
+            $bookingResp = $this->bookingService->findbyId($businessId, $serviceId, $bookingId, $isGerente);
 
             return $this->ok($bookingResp);
         } catch (AppException $th) {
@@ -48,25 +51,15 @@ class PreBookingController extends Controller
     // TODO: ESTE MÉTODO ES EL QUE USA stdClass en la función del repo (Aun no separé el queryBuilder)
     // Obtiene todas las reservas de un determinado negocio
     // todo: Posteriormente habrá que hacer el resto de findAll's(Por servicio, que estén activas...)
-    public function findAll(int $businessId, int $serviceId): JsonResponse
+    public function findAll(int $businessId, int $serviceId, Request $request): JsonResponse
     {
         try {
-            $bookingsResp = $this->bookingService->findAll($businessId, $serviceId);
+            $user = $request->user();
+            $isGerente = $user?->isGerente() ?? false;
+
+            $bookingsResp = $this->bookingService->findAll($businessId, $serviceId, $isGerente);
 
             return $this->ok($bookingsResp);
-        } catch (AppException $th) {
-            return $this->error($th->getMessage(), $th->getStatusCode());
-        } catch (Throwable $th) {
-            return $this->internalError($th);
-        }
-    }
-
-    public function delete(int $businessId, int $serviceId, int $bookingId): JsonResponse
-    {
-        try {
-            $this->bookingService->delete($businessId, $serviceId, $bookingId);
-
-            return $this->noContent();
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
@@ -78,12 +71,29 @@ class PreBookingController extends Controller
     {
         try {
             $this->validateBookings($request);
+            $authUserId = $request->user()->id;
+
             $dto = BookingRequestDTO::createFromArray($request->all(), $serviceId);
-            $bookingResp = $this->bookingService->create($businessId, $dto);
+            $bookingResp = $this->bookingService->create($businessId, $dto, $authUserId);
 
             return $this->ok($bookingResp);
         } catch (ValidationException $th) {
             return $this->error($th->validator->errors()->first());
+        } catch (AppException $th) {
+            return $this->error($th->getMessage(), $th->getStatusCode());
+        } catch (Throwable $th) {
+            return $this->internalError($th);
+        }
+    }
+
+    public function delete(int $businessId, int $serviceId, int $bookingId, Request $request): JsonResponse
+    {
+        try {
+            $authUserId = $request->user()->id;
+
+            $this->bookingService->delete($businessId, $serviceId, $bookingId, $authUserId);
+
+            return $this->noContent();
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {

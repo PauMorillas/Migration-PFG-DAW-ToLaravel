@@ -16,12 +16,12 @@ readonly class PreBookingService
 {
     public function __construct(private PreBookingRepositoryInterface $bookingRepository,
                                 private ServiceService                $serviceService,
-                                private BusinessService               $businessService,)
+                                private BusinessService               $businessService)
     {
     }
     private const BOOKING_EXPIRATION_MINS = 30;
 
-    public function findById(int $businessId, int $serviceId, int $bookingId): ?BookingResponseDTO
+    public function findById(int $businessId, int $serviceId, int $bookingId, bool $includeUser): ?BookingResponseDTO
     {
         // Esta función valida que el negocio existe y
         // que el service pertencece al business por eso la usaré
@@ -31,24 +31,25 @@ readonly class PreBookingService
 
         $this->assertPreBookingBelongsToService($preBooking, $serviceId);
 
-        return BookingResponseDTO::createFromPreBookingModel($preBooking);
+        return BookingResponseDTO::createFromPreBookingModel($preBooking, $includeUser);
     }
 
-    public function findAll(int $businessId, int $serviceId): array
+    public function findAll(int $businessId, int $serviceId, bool $includeUser): array
     {
         $this->businessService->assertExists($businessId);
         $this->serviceService->assertExists($serviceId);
 
         $preBookings = $this->bookingRepository->findAll($businessId);
 
-        return $preBookings->map(function (stdClass $preBooking) {
-            return BookingResponseDTO::createFromStdClass($preBooking);
+        return $preBookings->map(function (stdClass $preBooking) use ($includeUser) {
+            return BookingResponseDTO::createFromStdClass($preBooking, $includeUser);
         })->toArray();
     }
 
-    public function create(int $businessId, BookingRequestDTO $data): BookingResponseDTO
+    public function create(int $businessId, BookingRequestDTO $data, int $authUserId): BookingResponseDTO
     {
         $this->serviceService->findById($businessId, $data->serviceId);
+        $this->businessService->assertUserCanModifyBusiness($businessId, $authUserId);
 
         $payload = $data->toArray() + [
                 'token' => $this->generateRandomToken(),
@@ -60,9 +61,10 @@ readonly class PreBookingService
         return BookingResponseDTO::createFromPreBookingModel($preBooking);
     }
 
-    public function delete(int $businessId, int $serviceId, int $bookingId): bool
+    public function delete(int $businessId, int $serviceId, int $bookingId, int $authUserId): bool
     {
         $this->serviceService->findById($businessId, $serviceId);
+        $this->businessService->assertUserCanModifyBusiness($businessId, $authUserId);
 
         $preBooking = $this->getPreBookingModelOrFail($bookingId);
 

@@ -5,10 +5,11 @@ namespace App\DTO\User;
 use App\Models\User;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
+use stdClass;
 
 readonly class UserResponseDTO implements Arrayable, JsonSerializable
 {
-    public function __construct(public int      $id,
+    public function __construct(public ?int     $id,
                                 private string  $name,
                                 private string  $email,
                                 private ?string $telephone = null)
@@ -23,6 +24,32 @@ readonly class UserResponseDTO implements Arrayable, JsonSerializable
             name: $user->name,
             email: $user->email,
             telephone: $user->telephone,
+        );
+    }
+
+    // Crea un objeto de User a través de las columnas de la tabla PreBookings
+    public static function createFromStdClass(stdClass $row): self
+    {
+        return new self(
+            id: $row->user_id,
+            name: $row->user_name,
+            email: $row->user_email,
+            telephone: $row->user_phone,
+        );
+    }
+
+    // Cuando viene de una preBooking
+    public static function createFromPreBooking(
+        string  $name,
+        string  $email,
+        ?string $phone
+    ): self
+    {
+        return new self(
+            id: null,
+            name: $name,
+            email: $email,
+            telephone: $phone,
         );
     }
 
