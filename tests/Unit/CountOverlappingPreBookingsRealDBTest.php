@@ -16,8 +16,7 @@ class CountOverlappingPreBookingsRealDBTest extends TestCase
     #[Test]
     public function it_counts_overlapping_prebookings_correctly()
     {
-        // Crea un servicio para que la FK no falle
-        $service = Service::factory()->create(); // Laravel 9+ factory
+        $service = Service::factory()->create();
         $serviceId = $service->id;
 
         // PreBooking 1: empieza antes y termina dentro del periodo

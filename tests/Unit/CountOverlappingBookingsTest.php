@@ -11,9 +11,6 @@ use Tests\TestCase;
 
 class CountOverlappingBookingsTest extends TestCase
 {
-    /**
-     * A basic unit test example.
-     */
     public function testDetectsOverlappingBookingsWithMock(): void {
         // Crear un mock del repo
         $repoMock = Mockery::mock(BookingRepositoryInterface::class);
@@ -29,7 +26,7 @@ class CountOverlappingBookingsTest extends TestCase
             ->once() // Verifica que el mock fue llamado exactamente una vez - assertion 1
             ->andReturn(1);
 
-        // Llamamos al método
+        // Llamamos a la función
         $count = $repoMock->countOverlappingBookings(
             serviceId: 1,
             startDate: '2025-01-10 10:00:00',
