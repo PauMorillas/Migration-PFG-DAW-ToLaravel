@@ -6,14 +6,12 @@ use App\Models\PreBooking;
 use App\Models\Service;
 use App\Repositories\Contracts\PreBookingRepositoryInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class CountOverlappingPreBookingsRealDBTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[Test]
     public function it_counts_overlapping_prebookings_correctly()
     {
         $service = Service::factory()->create();

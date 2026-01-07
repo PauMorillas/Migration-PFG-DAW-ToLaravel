@@ -33,9 +33,6 @@ class BookingController extends Controller
         'status' => 'estado'
     ];
 
-    /* TODO: Hacer un método para OBTENER RESERVAS QUE SE SOLAPEN
-    *       Y el create también
-    */
     public function findAll(int $businessId, int $serviceId, Request $request): JsonResponse
     {
         try {

@@ -50,7 +50,6 @@ class PreBookingController extends Controller
 
     // TODO: ESTE MÉTODO ES EL QUE USA stdClass en la función del repo (Aun no separé el queryBuilder)
     // Obtiene todas las reservas de un determinado negocio
-    // todo: Posteriormente habrá que hacer el resto de findAll's(Por servicio, que estén activas...)
     public function findAll(int $businessId, int $serviceId, Request $request): JsonResponse
     {
         try {
@@ -101,7 +100,6 @@ class PreBookingController extends Controller
         }
     }
 
-    //TODO: No parece necesario este método
     public function update(int $businessId, int $serviceId, int $bookingId): JsonResponse
     {
         return $this->noContent();

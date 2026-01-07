@@ -10,6 +10,7 @@ use App\Models\PreBooking;
 use App\Repositories\Contracts\BookingRepositoryInterface;
 use App\Repositories\Contracts\PreBookingRepositoryInterface;
 use App\Exceptions\BookingDoesntBelongToServiceException;
+use Carbon\Carbon;
 use Nette\Utils\Random;
 use Random\RandomException;
 use stdClass;
@@ -86,15 +87,17 @@ readonly class PreBookingService
 
     // TODO: Necesitamos recuperar el id del usuario si no viene de la request (seguramente no por la implementacion de JS)
     // Posible solución-> buscar el usuario con el correo de la prebooking y coger ese id para hacer la relacion en bd
-    private function confirmPreBooking(int $serviceId, int $userId, string $token): BookingResponseDTO
+    public function confirmPreBooking(int $serviceId, int $userId, string $token): BookingResponseDTO
     {
         $preBooking = $this->preBookingRepository->findByToken($token);
 
         if (is_null($preBooking)) {
             throw new BookingNotFoundException();
         }
+        // 2026-01-07 08:39:39
+        $expirationDate = Carbon::createFromFormat('Y-m-d H:i:s', $preBooking->expiration_date);
         // Si el tiempo de reserva ha expirado se manda una excepción
-        if ($preBooking->expiration_date->isPast()) {
+        if ($expirationDate->isPast()) {
             $this->deleteByPreBookingModel($preBooking);
             throw new PreBookingExpiredException();
         }

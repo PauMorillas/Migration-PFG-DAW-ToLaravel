@@ -14,14 +14,12 @@ use App\Exceptions\BusinessNotFoundException;
 use App\Repositories\Contracts\BusinessRepositoryInterface;
 
 
-// TODO: SE DEBE VALIDAR QUE EL USUARIO ASOCIADO EXISTE ANTES DE NINGUNA CRUD
-// y que le pertenecen los negocios y servicios que quiere editar
 readonly class BusinessService
 {
 
     public function __construct(
         private BusinessRepositoryInterface $businessRepository,
-        private UserService $userService)
+        private UserService                 $userService)
     {
     }
 
@@ -92,7 +90,7 @@ readonly class BusinessService
         $user = $this->userService->findById($userId);
         $business = $this->businessRepository->findById($businessId);
 
-        if(!$user) {
+        if (!$user) {
             throw new UserNotFoundException();
         }
 

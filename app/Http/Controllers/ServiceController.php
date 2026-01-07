@@ -13,7 +13,6 @@ use App\DTO\Service\UpdateServiceDTO;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
-// TODO: Revisar los trycatch de errores 500
 class ServiceController extends Controller
 {
     use ApiResponseTrait;
