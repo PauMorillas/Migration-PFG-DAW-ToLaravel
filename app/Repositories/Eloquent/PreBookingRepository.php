@@ -40,7 +40,7 @@ class PreBookingRepository implements PreBookingRepositoryInterface
             ->first();
     }
 
-    public function countOverlappingPreBooking(int $serviceId,
+    public function countOverlappingPreBookings(int $serviceId,
                                                string $startDate,
                                                string $endDate,
                                                ?int $ignorePreBookingId): ?int

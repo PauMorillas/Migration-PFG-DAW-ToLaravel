@@ -12,5 +12,5 @@ interface PreBookingRepositoryInterface {
     public function create(array $data): PreBooking;
     public function delete(PreBooking $preBooking): void;
     public function findByToken(string $token): ?PreBooking;
-    public function countOverlappingPreBooking(int $serviceId, string $startDate, string $endDate, ?int $ignorePreBookingId): ?int;
+    public function countOverlappingPreBookings(int $serviceId, string $startDate, string $endDate, ?int $ignorePreBookingId): ?int;
 }
