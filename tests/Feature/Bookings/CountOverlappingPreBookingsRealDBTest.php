@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Feature\Bookings;
 
 use App\Models\PreBooking;
 use App\Models\Service;
@@ -12,7 +12,7 @@ class CountOverlappingPreBookingsRealDBTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function it_counts_overlapping_prebookings_correctly()
+    public function test_it_counts_overlapping_prebookings_correctly()
     {
         $service = Service::factory()->create();
         $serviceId = $service->id;
