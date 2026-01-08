@@ -19,10 +19,14 @@ class PostController
 
     }
 
+    // TODO: Usar un bus?
+    // TODO: hacer el objeto (que extienda de Object) en vez de un modelo Eloquent
+    // TODO: Realmente no es un command porque esta devolviendo un objeto de Respuesta - Debe ir en Query
     public function __invoke(int $businessId,
                              int $serviceId,
                              Request $request): JsonResponse
     {
+        // todo: usar el create de la entidad en vez de el constructor
         $command = new CreatePreBookingCommand(
             businessId: $businessId,
             serviceId: $serviceId,

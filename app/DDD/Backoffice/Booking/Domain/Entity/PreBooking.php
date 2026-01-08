@@ -1,10 +1,9 @@
 <?php
 
-namespace App\DDD\Backoffice\Booking\Application\Command;
+namespace App\DDD\Backoffice\Booking\Domain\Entity;
 
-readonly class CreatePreBookingCommand
+class PreBooking
 {
-    // ESTO TIENEN QUE SER VALUEOBJECTS
     public function __construct(
         public int $businessId,
         public int $serviceId,
@@ -17,10 +16,6 @@ readonly class CreatePreBookingCommand
         public string $userPass,
     )
     {
-    }
-
-    // TODO: esta función tiene que convertir de los valueObjects a los primitivos
-    public static function create() {
 
     }
 }
