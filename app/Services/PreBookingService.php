@@ -94,7 +94,7 @@ readonly class PreBookingService
         if (is_null($preBooking)) {
             throw new BookingNotFoundException();
         }
-        // 2026-01-07 08:39:39
+        // Formato de la BD: 2026-01-07 08:39:39
         $expirationDate = Carbon::createFromFormat('Y-m-d H:i:s', $preBooking->expiration_date);
         // Si el tiempo de reserva ha expirado se manda una excepción
         if ($expirationDate->isPast()) {
@@ -108,7 +108,9 @@ readonly class PreBookingService
             'service_id' => $serviceId,
             'user_id' => $userId,
         ];
-
+        // Se borra la prebooking asociada
+        $this->deleteByPreBookingModel($preBooking);
+        // Se crea la booking final
         $this->bookingRepository->create($bookingData);
 
         return BookingResponseDTO::createFromPreBookingModel($preBooking);
