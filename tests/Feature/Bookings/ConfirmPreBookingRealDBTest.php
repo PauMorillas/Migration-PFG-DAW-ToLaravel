@@ -46,7 +46,7 @@ class ConfirmPreBookingRealDBTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        // assertion 2: asegurar que se borra la PreBooking
+        // assertion 2: asegurar que se borra la Booking
         $this->assertSoftDeleted('pre_bookings', [
             'id' => $preBooking->id,
         ]);

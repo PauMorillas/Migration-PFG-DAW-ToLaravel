@@ -17,7 +17,7 @@ class CountOverlappingPreBookingsRealDBTest extends TestCase
         $service = Service::factory()->create();
         $serviceId = $service->id;
 
-        // PreBooking 1: empieza antes y termina dentro del periodo
+        // Booking 1: empieza antes y termina dentro del periodo
         PreBooking::create([
             'service_id' => $serviceId,
             'token' => 'token1',
@@ -30,7 +30,7 @@ class CountOverlappingPreBookingsRealDBTest extends TestCase
             'user_pass' => 'password123',
         ]);
 
-        // PreBooking 2: empieza dentro y termina después del periodo
+        // Booking 2: empieza dentro y termina después del periodo
         PreBooking::create([
             'service_id' => $serviceId,
             'token' => 'token2',
@@ -43,7 +43,7 @@ class CountOverlappingPreBookingsRealDBTest extends TestCase
             'user_pass' => 'password123',
         ]);
 
-        // PreBooking 3: fuera del periodo (no debería contarse)
+        // Booking 3: fuera del periodo (no debería contarse)
         PreBooking::create([
             'service_id' => $serviceId,
             'token' => 'token3',

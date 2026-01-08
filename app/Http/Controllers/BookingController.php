@@ -65,7 +65,7 @@ class BookingController extends Controller
     }
 
     // Me da que no se consumirá mediante endpoint,
-    // -> la consumirá el service de PreBooking al confirmar la PreReserva
+    // -> la consumirá el service de Booking al confirmar la PreReserva
     public function create(int $businessId, int $serviceId, Request $request): JsonResponse
     {
         try {

@@ -9,15 +9,17 @@ use JsonSerializable;
 readonly class BookingRequestDTO implements Arrayable, JsonSerializable
 {
 
-    public function __construct(private ?int    $bookingId,
-                                public int      $serviceId,
-                                private string  $startDate,
-                                private string  $endDate,
+    public function __construct(
+        public int      $serviceId,
+        private string  $startDate,
+        private string  $endDate,
 
-                                private string  $userName,
-                                private string  $userEmail,
-                                private ?string $userPhone,
-                                private string  $userPass
+        private string  $userName,
+        private string  $userEmail,
+        private string  $userPass,
+        private ?string $userPhone = null,
+
+        private ?int    $bookingId = null,
     )
     {
     }
@@ -25,14 +27,14 @@ readonly class BookingRequestDTO implements Arrayable, JsonSerializable
     public static function createFromArray(array $data, int $serviceId, ?int $bookingId = null): self
     {
         return new self(
-            $bookingId,
             $serviceId,
             $data['start_date'],
             $data['end_date'],
             $data['user_name'],
             $data['user_email'],
-            $data['user_phone'],
             $data['user_pass'],
+            $data['user_phone'] ?? null,
+            $bookingId,
         );
     }
 
