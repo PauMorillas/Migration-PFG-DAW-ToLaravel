@@ -3,14 +3,16 @@
 namespace App\DDD\Backoffice\Shared\ValueObject;
 
 use App\DDD\Backoffice\Shared\Exception\EmailFormatIsNotValidException;
+use App\DDD\Backoffice\Shared\ValueObject\Text;
 
-class Email
+readonly class Email extends Text
 {
-    protected string $value;
-    public function __construct(string $value)
+    protected function __construct(string $value)
     {
         if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
             throw new EmailFormatIsNotValidException();
         }
+
+        parent::__construct($value);
     }
 }

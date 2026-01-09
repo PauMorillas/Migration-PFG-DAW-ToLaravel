@@ -7,10 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class BookingDoesntBelongToServiceException extends AppException
 {
-    protected int $statusCode = Response::HTTP_UNAUTHORIZED;
-
-    public function __construct()
+    public function __construct(?string $message = 'La reserva no pertenece al servicio especificado.')
     {
-        parent::__construct('La reserva no pertenece al servicio especificado.');
+        $this->statusCode = Response::HTTP_UNAUTHORIZED;
+        parent::__construct($message);
     }
 }

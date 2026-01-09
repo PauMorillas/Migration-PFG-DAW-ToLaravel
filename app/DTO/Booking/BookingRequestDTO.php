@@ -18,13 +18,13 @@ readonly class BookingRequestDTO implements Arrayable, JsonSerializable
         private string  $userEmail,
         private string  $userPass,
         private ?string $userPhone = null,
-
         private ?int    $bookingId = null,
+        public ?int     $authUserId = null,
     )
     {
     }
 
-    public static function createFromArray(array $data, int $serviceId, ?int $bookingId = null): self
+    public static function createFromArray(array $data, int $serviceId, ?int $bookingId = null, ?int $authUserId = null): self
     {
         return new self(
             $serviceId,
@@ -35,6 +35,22 @@ readonly class BookingRequestDTO implements Arrayable, JsonSerializable
             $data['user_pass'],
             $data['user_phone'] ?? null,
             $bookingId,
+            $authUserId
+        );
+    }
+
+    public static function createFromArrayCommand(iterable $data): self
+    {
+        return new self(
+            $data['service_id'],
+            $data['start_date'],
+            $data['end_date'],
+            $data['user_name'],
+            $data['user_email'],
+            $data['user_pass'],
+            $data['user_phone'] ?? null,
+            $data['booking_id'],
+            $data['auth_user_id'],
         );
     }
 
@@ -50,6 +66,7 @@ readonly class BookingRequestDTO implements Arrayable, JsonSerializable
             'user_email' => $this->userEmail,
             'user_phone' => $this->userPhone,
             'user_pass' => $this->userPass,
+            'auth_user_id' => $this->authUserId,
         ];
     }
 

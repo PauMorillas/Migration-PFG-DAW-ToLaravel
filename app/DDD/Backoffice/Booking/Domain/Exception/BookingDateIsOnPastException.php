@@ -7,9 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BookingDateIsOnPastException extends AppException
 {
-    protected int $statusCode = Response::HTTP_BAD_REQUEST;
     public function __construct()
     {
+        $this->statusCode = Response::HTTP_BAD_REQUEST;
         parent::__construct('La reserva contiene una fecha en el pasado');
     }
 }

@@ -2,9 +2,8 @@
 
 namespace App\DDD\Backoffice\Shared\ValueObject;
 
+use App\DDD\Backoffice\Shared\Exception\InvalidAppDateException;
 use Carbon\Carbon;
-use Carbon\Exceptions\InvalidDateException;
-use Exception;
 
 abstract readonly class Date
 {
@@ -13,29 +12,45 @@ abstract readonly class Date
     protected const FORMAT = 'Y-m-d';
     protected Carbon $value;
 
-    public function __construct(string $date) {
-        $this->ensureIsValidDate($date);
-        $this->value = Carbon::createFromFormat(static::FORMAT, $date);
+    protected function __construct(string|Carbon $date)
+    {
+        // Si es Carbon, lo convertimos a string usando el formato de la clase
+        // para pasarle la "prueba de fuego" de la validación.
+        $dateAsString = $date instanceof Carbon
+            ? $date->format(static::FORMAT)
+            : $date;
+
+        $this->ensureIsValidDate($dateAsString);
+        $this->value = Carbon::createFromFormat(static::FORMAT, $dateAsString);
     }
 
-    private function ensureIsValidDate(string $date): void {
-        try {
-            $formatedDate = Carbon::createFromFormat(static::FORMAT, $date);
+    public static function createFromString(string $date): static
+    {
+        return new static($date);
+    }
 
-            if (is_null($formatedDate) || $formatedDate->format(static::FORMAT) !== $date) {
-                // TODO: EXCEPCIONES PROPIAS DE DOMINIO
-                throw new InvalidDateException($date, 'La fecha no tiene un formato válido');
-            }
-        } catch (Exception $ex) {
-            throw new InvalidDateException($ex->getMessage(), $ex->getCode());
+    public static function createFromCarbon(Carbon $date): static
+    {
+        return new static($date);
+    }
+
+    private function ensureIsValidDate(string $date): void
+    {
+        $formattedDate = Carbon::createFromFormat(static::FORMAT, $date);
+
+        if (is_null($formattedDate) || $formattedDate->format(static::FORMAT) !== $date) {
+            throw new InvalidAppDateException("La fecha $date no coincide con el formato " . static::FORMAT);
         }
     }
 
-    public function getValue(): string {
+    public function value(): string
+    {
         return $this->value->format(static::FORMAT);
     }
 
-    public function getValueAsCarbon(): Carbon {
-        return $this->value;
+    public function valueAsCarbon(): Carbon
+    {
+        // Devolvemos una copia para asegurar la inmutabilidad
+        return $this->value->copy();
     }
 }

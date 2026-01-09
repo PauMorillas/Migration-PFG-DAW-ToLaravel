@@ -6,10 +6,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PreBookingExpiredException extends AppException
 {
-    protected int $statusCode = Response::HTTP_GONE; // El recurso existía pero ha dejado de estar disponible
 
-    public function __construct()
+    public function __construct(?string $message = 'El tiempo para confirmar la PreReserva ha expirado. Por favor, reserve de nuevo.')
     {
-        parent::__construct('El tiempo para confirmar la PreReserva ha expirado. Por favor, reserve de nuevo.');
+        $this->statusCode = Response::HTTP_GONE; // El recurso existía pero ha dejado de estar disponible
+        parent::__construct($message);
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\DDD\Backoffice\Booking\Domain\ValueObject;
+namespace App\DDD\Backoffice\Service\Domain\ValueObject;
 
 use App\DDD\Backoffice\Shared\ValueObject\Id;
 
-final readonly class BookingId extends Id
+final readonly class ServiceId extends Id
 {
     protected function __construct(int $value)
     {

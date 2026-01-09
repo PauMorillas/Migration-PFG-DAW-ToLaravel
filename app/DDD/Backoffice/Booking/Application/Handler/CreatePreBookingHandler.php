@@ -15,17 +15,9 @@ readonly class CreatePreBookingHandler
 
     public function __invoke(CreatePreBookingCommand $command): BookingResponseDTO {
         return $this->preBookingService->create(
-            businessId: $command->businessId,
-            data: new BookingRequestDTO(
-                serviceId: $command->serviceId,
-                startDate: $command->startDate,
-                endDate: $command->endDate,
-                userName: $command->userName,
-                userEmail: $command->userEmail,
-                userPass: $command->userPass,
-                userPhone: $command->userPhone
-            ),
-            authUserId: $command->authUserId
+            businessId: $command->businessId->value(),
+            data: BookingRequestDTO::createFromArrayCommand($command->toPrimitives()),
+            authUserId: $command->authUserId->value(),
         );
     }
 }
