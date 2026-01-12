@@ -48,6 +48,7 @@ class PostController
             $dto = BookingRequestDTO::createFromArray(
                 $request->only(array_keys(self::PREBOOKING_ATTRIBUTES)),
                 $serviceId,
+                null,
                 $request->user()->id,
             );
 

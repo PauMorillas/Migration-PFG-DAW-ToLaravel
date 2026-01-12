@@ -3,14 +3,15 @@
 namespace App\DDD\Backoffice\Booking\Infrastructure\Persistence;
 
 use App\DDD\Backoffice\Booking\Domain\Entity\PreBooking;
+use App\DDD\Backoffice\Booking\Domain\Repository\PreBookingRepositoryV2Interface;
+use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingDate;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingId;
 use App\DDD\Backoffice\Business\Domain\ValueObject\BusinessId;
+use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use stdClass;
 
-final readonly class EloquentPreBookingRepository
+final readonly class EloquentPreBookingRepository implements PreBookingRepositoryV2Interface
 {
     public function findById(BookingId $bookingId): ?PreBooking
     {
@@ -64,21 +65,21 @@ final readonly class EloquentPreBookingRepository
             : null;
     }
 
-    public function countOverlappingPreBookings(int    $serviceId,
-                                                string $startDate,
-                                                string $endDate,
-                                                ?int   $ignorePreBookingId): ?int
+    public function countOverlappingPreBookings(ServiceId    $serviceId,
+                                                BookingDate $startDate,
+                                                BookingDate $endDate,
+                                                ?BookingId   $ignorePreBookingId): ?int
     {
         $query = DB::table('pre_bookings')
-            ->where('service_id', $serviceId)
-            ->where('start_date', '<', $endDate)
-            ->where('end_date', '>', $startDate)
+            ->where('service_id', $serviceId->value())
+            ->where('start_date', '<', $endDate->value())
+            ->where('end_date', '>', $startDate->value())
             // No contamos con las PreReservas expiradas ni con las eliminadas
-            ->where('expiration_date', '>', now())
+            ->where('expiration_date', '>', now()->subMinute())
             ->whereNull('deleted_at');
 
         if ($ignorePreBookingId) {
-            $query->where('id', '!=', $ignorePreBookingId);
+            $query->where('id', '!=', $ignorePreBookingId->value());
         }
 
         return $query->count();

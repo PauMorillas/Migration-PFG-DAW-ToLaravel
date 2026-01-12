@@ -49,7 +49,7 @@ readonly class BookingRequestDTO implements Arrayable, JsonSerializable
             $data['user_email'],
             $data['user_pass'],
             $data['user_phone'] ?? null,
-            $data['booking_id'],
+            $data['booking_id']?? null,
             $data['auth_user_id'],
         );
     }

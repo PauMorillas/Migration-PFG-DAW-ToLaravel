@@ -5,6 +5,8 @@ namespace App\DDD\Backoffice\Booking\Domain\Service;
 use App\DDD\Backoffice\Booking\Domain\Entity\PreBooking;
 use App\DDD\Backoffice\Booking\Domain\Repository\PreBookingRepositoryV2Interface;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingDate;
+use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingId;
+use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingToken;
 use App\DDD\Backoffice\Booking\Infrastructure\Persistence\EloquentPreBookingRepository;
 use App\DDD\Backoffice\Business\Domain\ValueObject\BusinessId;
 use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
@@ -26,7 +28,7 @@ final readonly class PreBookingServiceV2
 
     private const BOOKING_EXPIRATION_MINS = 30;
 
-    protected function __construct(
+    public function __construct(
         private PreBookingRepositoryV2Interface $preBookingRepository,
         private BookingRepositoryInterface      $bookingRepository,
         private ServiceService                  $serviceService,
@@ -41,6 +43,7 @@ final readonly class PreBookingServiceV2
         $this->serviceService->findById($businessId->value(), $bookingRequestDTO->serviceId);
         $this->businessService->assertUserCanModifyBusiness($businessId->value(), $authUserId->value());
 
+        // todo: el modelo no tiene token hay que hacerlo ahora
         $payload = $bookingRequestDTO->toArray()
             + [
                 'token' => $this->generateRandomToken(),
@@ -67,7 +70,6 @@ final readonly class PreBookingServiceV2
     private function mapPreBooking(array $payload, AuthUserId $authUserId): PreBooking
     {
         return PreBooking::create(
-            id: null,
             serviceId: ServiceId::createFromInt(($payload['service_id'])),
             authUserId: $authUserId,
             startDate: BookingDate::createfromString($payload['start_date']),
@@ -76,8 +78,14 @@ final readonly class PreBookingServiceV2
             userEmail: Text::createFromString($payload['user_email']),
             userPhone: SpanishPhoneNumber::createFromString($payload['user_phone']),
             userPass: Password::createFromString($payload['user_pass']),
-            uuid: Uuid::crateFromString($payload['uuid']
-                ?? Uuid::random()),
+            bookingToken: BookingToken::createFromString($payload['token']),
+            expirationDate: BookingDate::createfromString($payload['expiration_date']),
+            id: isset($payload['id'])
+                ? BookingId::createFromInt($payload['id'])
+                : null,
+            uuid: isset($payload['uuid'])
+                ? Uuid::createFromString($payload['uuid'])
+                : Uuid::random(),
         );
     }
 }

@@ -21,7 +21,7 @@ final readonly class Uuid
         $this->value = $normalized;
     }
 
-    public static function crateFromString(string $value): self
+    public static function createFromString(string $value): self
     {
         return new static($value);
     }

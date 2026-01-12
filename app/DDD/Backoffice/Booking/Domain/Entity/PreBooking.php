@@ -4,6 +4,7 @@ namespace App\DDD\Backoffice\Booking\Domain\Entity;
 
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingDate;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingId;
+use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingToken;
 use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
 use App\DDD\Backoffice\Shared\ValueObject\Password;
 use App\DDD\Backoffice\Shared\ValueObject\SpanishPhoneNumber;
@@ -19,8 +20,6 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
 {
 
     protected function __construct(
-        private BookingId          $id,
-        private ?Uuid              $uuid,
         private ServiceId          $serviceId,
         private AuthUserId         $authUserId,
 
@@ -31,12 +30,15 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         private Text               $userEmail,
         private SpanishPhoneNumber $userPhone,
         private Password           $userPass,
+        private BookingToken       $bookingToken,
+        private BookingDate        $expirationDate,
+        private ?BookingId         $id,
+        private ?Uuid              $uuid,
     )
     {
     }
 
     public static function create(
-        BookingId          $id,
         ServiceId          $serviceId,
         AuthUserId         $authUserId,
         BookingDate        $startDate,
@@ -45,12 +47,13 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         Text               $userEmail,
         SpanishPhoneNumber $userPhone,
         Password           $userPass,
-        ?Uuid              $uuid = null,
+        BookingToken       $bookingToken,
+        BookingDate        $expirationDate,
+        ?BookingId         $id = null,
+        ?Uuid              $uuid = null
     ): self
     {
         return new self(
-            id: $id,
-            uuid: $uuid,
             serviceId: $serviceId,
             authUserId: $authUserId,
             startDate: $startDate,
@@ -58,15 +61,17 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
             userName: $userName,
             userEmail: $userEmail,
             userPhone: $userPhone,
-            userPass: $userPass
+            userPass: $userPass,
+            bookingToken: $bookingToken,
+            expirationDate: $expirationDate,
+            id: $id,
+            uuid: $uuid,
         );
     }
 
     public static function fromEloquentModel(Model $model): self
     {
-        $entity = new self(
-            id: BookingId::createFromInt($model->id),
-            uuid: $model->uuid ? Uuid::crateFromString($model->uuid) : null,
+        return new self(
             serviceId: ServiceId::createFromInt($model->service_id),
             authUserId: AuthUserId::createFromInt($model->auth_user_id),
             startDate: BookingDate::createFromString($model->start_date),
@@ -74,10 +79,12 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
             userName: Text::createFromString($model->user_name),
             userEmail: Text::createFromString($model->user_email),
             userPhone: SpanishPhoneNumber::createFromString($model->user_phone),
-            userPass: Password::createFromString($model->user_pass)
+            userPass: Password::createFromString($model->user_pass),
+            bookingToken: BookingToken::createFromString($model->token),
+            expirationDate: BookingDate::createFromString($model->expiration_date),
+            id: BookingId::createFromInt($model->id),
+            uuid: $model->uuid ? Uuid::createFromString($model->uuid) : null,
         );
-
-        return $entity;
     }
 
     public static function getEloquentModel(): Model
@@ -89,7 +96,7 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
             public $incrementing = true;
 
             protected $fillable = [
-                /*'uuid',*/
+                'uuid',
                 'id',
                 'service_id',
                 'user_id',
@@ -112,7 +119,7 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         $model->id = $exists ? $this->id?->value() : null;
         $model->uuid = $this->uuid?->value();
         $model->service_id = $this->serviceId->value();
-        $model->auth_user_id = $this->authUserId->value();
+        $model->user_id = $this->authUserId->value();
         $model->start_date = $this->startDate->value();
         $model->end_date = $this->endDate->value();
 
@@ -137,11 +144,13 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         return $this->uuid !== null;
     }
 
-    public function getId(): BookingId {
+    public function getId(): BookingId
+    {
         return $this->id;
     }
 
-    public function getServiceId(): ServiceId {
+    public function getServiceId(): ServiceId
+    {
         return $this->serviceId;
     }
 

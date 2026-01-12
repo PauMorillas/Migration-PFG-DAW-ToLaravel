@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\DDD\Backoffice\Booking\Domain\Repository\PreBookingRepositoryV2Interface;
+use App\DDD\Backoffice\Booking\Domain\Service\PreBookingServiceV2;
 use App\DDD\Backoffice\Booking\Infrastructure\Persistence\EloquentPreBookingRepository;
 use App\Repositories\Contracts\BookingRepositoryInterface;
 use App\Repositories\Contracts\PreBookingRepositoryInterface;
