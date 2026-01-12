@@ -2,6 +2,8 @@
 
 namespace App\DTO\User;
 
+use App\DDD\Backoffice\Shared\ValueObject\SpanishPhoneNumber;
+use App\DDD\Backoffice\Shared\ValueObject\Text;
 use App\Models\User;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
@@ -50,6 +52,20 @@ readonly class UserResponseDTO implements Arrayable, JsonSerializable
             name: $name,
             email: $email,
             telephone: $phone,
+        );
+    }
+
+    public static function createFromDDDPreBooking(
+        Text $name,
+        Text $email,
+        SpanishPhoneNumber $phone
+    ): self
+    {
+        return new self(
+            id: null,
+            name: $name->value(),
+            email: $email->value(),
+            telephone: $phone?->value()
         );
     }
 

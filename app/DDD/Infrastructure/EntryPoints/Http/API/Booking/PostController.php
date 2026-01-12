@@ -31,7 +31,7 @@ class PostController
 
     }
 
-    // todo: el dto lleva value objects (en este caso no es necesario) además aqui les gusta mas hacer payloads que son básicamente lo que necesita el caso de uso para funcionar, y el command si lleva los ids, y el objeto dto dentro para no engorrar todo de datos, esa es la clave que no estaba entendiendo
+    // todo: el dto lleva value objects (en este caso no es necesario un DTO) además aqui les gusta mas hacer payloads que son básicamente lo que necesita el caso de uso para funcionar, y el command si lleva los ids, y el objeto dto dentro para no engorrar todo de datos, esa es la clave que no estaba entendiendo
     // todo: el value object siempre usará el constructor de manera
     // protegida o privada y solo habrán ciertas maneras de crear los
     // objetos, por ejemplo, create as Seconds en un value object time o un createAsMinutes sabes para ser más semanticos y si hay alguna manera de crearlos distintos
@@ -80,7 +80,6 @@ class PostController
             userPhone: $request->input('user_phone'),
             userPass: $request->input('user_pass'),
         );*/
-
 
     }
 }

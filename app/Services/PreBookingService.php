@@ -21,8 +21,7 @@ readonly class PreBookingService
                                 private BookingRepositoryInterface    $bookingRepository,
                                 private ServiceService                $serviceService,
                                 private BusinessService               $businessService)
-    {
-    }
+    {}
 
     private const BOOKING_EXPIRATION_MINS = 30;
 

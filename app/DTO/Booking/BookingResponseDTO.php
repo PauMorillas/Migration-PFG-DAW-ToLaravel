@@ -39,6 +39,24 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
         );
     }
 
+    public static function createFromDDDPreBookingModel
+    (\App\DDD\Backoffice\Booking\Domain\Entity\PreBooking $preBooking, ?bool $includeUser = false): self
+    {
+        return new self(
+            bookingId: $preBooking->getId()->value(),
+            serviceId: $preBooking->getServiceId()->value(),
+            startDate: $preBooking->getStartDate()->value(),
+            endDate: $preBooking->getEndDate()->value(),
+            status: null,
+            userResponse: $includeUser
+                ? UserResponseDTO::createFromDDDPreBooking(
+                    $preBooking->getUserName(),
+                    $preBooking->getUserEmail(),
+                    $preBooking->getUserPhone())
+                : null
+        );
+    }
+
     public static function createFromBookingModel(Booking $booking, bool $includeUser): self
     {
         return new self(

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\DDD\Backoffice\Booking\Domain\Repository\PreBookingRepositoryV2Interface;
+use App\DDD\Backoffice\Booking\Infrastructure\Persistence\EloquentPreBookingRepository;
 use App\Repositories\Contracts\BookingRepositoryInterface;
 use App\Repositories\Contracts\PreBookingRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
@@ -44,6 +46,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             BookingRepositoryInterface::class,
             BookingRepository::class
+        );
+
+        // Repo de la parte hecha aplicando DDD
+        $this->app->bind(
+            PreBookingRepositoryV2Interface::class,
+            EloquentPreBookingRepository::class
         );
     }
 
