@@ -28,12 +28,12 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
 
         private Text               $userName,
         private Text               $userEmail,
-        private SpanishPhoneNumber $userPhone,
         private Password           $userPass,
         private BookingToken       $bookingToken,
         private BookingDate        $expirationDate,
-        private ?BookingId         $id,
-        private ?Uuid              $uuid,
+        private ?BookingId         $id = null,
+        private ?Uuid              $uuid = null,
+        private ?SpanishPhoneNumber $userPhone = null,
     )
     {
     }
@@ -45,12 +45,12 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         BookingDate        $endDate,
         Text               $userName,
         Text               $userEmail,
-        SpanishPhoneNumber $userPhone,
         Password           $userPass,
         BookingToken       $bookingToken,
         BookingDate        $expirationDate,
         ?BookingId         $id = null,
-        ?Uuid              $uuid = null
+        ?Uuid              $uuid = null,
+        ?SpanishPhoneNumber $userPhone = null,
     ): self
     {
         return new self(
@@ -60,12 +60,12 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
             endDate: $endDate,
             userName: $userName,
             userEmail: $userEmail,
-            userPhone: $userPhone,
             userPass: $userPass,
             bookingToken: $bookingToken,
             expirationDate: $expirationDate,
             id: $id,
             uuid: $uuid,
+            userPhone: $userPhone
         );
     }
 
@@ -73,17 +73,17 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
     {
         return new self(
             serviceId: ServiceId::createFromInt($model->service_id),
-            authUserId: AuthUserId::createFromInt($model->auth_user_id),
+            authUserId: AuthUserId::createFromInt($model->user_id),
             startDate: BookingDate::createFromString($model->start_date),
             endDate: BookingDate::createFromString($model->end_date),
             userName: Text::createFromString($model->user_name),
             userEmail: Text::createFromString($model->user_email),
-            userPhone: SpanishPhoneNumber::createFromString($model->user_phone),
             userPass: Password::createFromString($model->user_pass),
             bookingToken: BookingToken::createFromString($model->token),
             expirationDate: BookingDate::createFromString($model->expiration_date),
-            id: BookingId::createFromInt($model->id),
+            id: $model->id ? BookingId::createFromInt($model->id) : null,
             uuid: $model->uuid ? Uuid::createFromString($model->uuid) : null,
+            userPhone: $model->user_phone ? SpanishPhoneNumber::createFromString($model->user_phone) : null,
         );
     }
 
@@ -102,6 +102,8 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
                 'user_id',
                 'start_date',
                 'end_date',
+                'token',
+                'expiration_date',
                 'user_name',
                 'user_email',
                 'user_phone',
@@ -122,10 +124,11 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         $model->user_id = $this->authUserId->value();
         $model->start_date = $this->startDate->value();
         $model->end_date = $this->endDate->value();
-
+        $model->token = $this->bookingToken->value();
+        $model->expiration_date = $this->expirationDate->value();
         $model->user_name = $this->userName->value();
         $model->user_email = $this->userEmail->value();
-        $model->user_phone = $this->userPhone->value();
+        $model->user_phone = $this->userPhone?->value();
         $model->user_pass = $this->userPass->value();
 
         return $model;
@@ -144,7 +147,7 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         return $this->uuid !== null;
     }
 
-    public function getId(): BookingId
+    public function getId(): ?BookingId
     {
         return $this->id;
     }
@@ -179,23 +182,24 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         return $this->userPhone;
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
-            'uuid' => $this->uuid?->value(),
-            'id' => $this->id->value(),
+            'uuid' => $this->uuid ? $this->uuid->value() : null,
+            'id' => $this->id ? $this->id->value() : null,
             'service_id' => $this->serviceId->value(),
-            'auth_user_id' => $this->authUserId->value(),
+            'user_id' => $this->authUserId->value(),
             'start_date' => $this->startDate->value(),
             'end_date' => $this->endDate->value(),
+            'token' => $this->bookingToken->value(),
+            'expiration_date' => $this->expirationDate->value(),
             'user_name' => $this->userName->value(),
             'user_email' => $this->userEmail->value(),
-            'user_phone' => $this->userPhone->value(),
-            'user_pass' => $this->userPass->value(),
+            'user_phone' => $this->userPhone ? $this->userPhone->value() : null,
         ];
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }

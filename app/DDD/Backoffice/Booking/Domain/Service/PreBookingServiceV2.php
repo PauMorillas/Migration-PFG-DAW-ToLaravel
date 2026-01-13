@@ -38,7 +38,8 @@ final readonly class PreBookingServiceV2
 
     }
 
-    public function create(BusinessId $businessId, BookingRequestDTO $bookingRequestDTO, AuthUserId $authUserId): BookingResponseDTO
+    public function create(BusinessId $businessId, BookingRequestDTO $bookingRequestDTO,
+                           AuthUserId $authUserId, bool $includeUser): BookingResponseDTO
     {
         $this->serviceService->findById($businessId->value(), $bookingRequestDTO->serviceId);
         $this->businessService->assertUserCanModifyBusiness($businessId->value(), $authUserId->value());
@@ -54,7 +55,7 @@ final readonly class PreBookingServiceV2
 
         $this->preBookingRepository->create($preBooking);
 
-        return BookingResponseDTO::createFromDDDPreBookingModel($preBooking);
+        return BookingResponseDTO::createFromDDDPreBookingModel($preBooking, $includeUser);
     }
 
     private function generateRandomToken(): string

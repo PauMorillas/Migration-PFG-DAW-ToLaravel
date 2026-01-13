@@ -5,12 +5,11 @@ namespace App\DDD\Backoffice\Booking\Domain\ValueObject;
 use App\DDD\Backoffice\Shared\ValueObject\Text;
 use Random\RandomException;
 
-// TODO: VAS POR AKI
 final readonly class BookingToken extends Text
 {
     protected string $value;
 
-    private function __construct(string $value)
+    protected function __construct(string $value)
     {
         parent::__construct($value);
     }
@@ -25,7 +24,7 @@ final readonly class BookingToken extends Text
         try {
             $bytes = random_bytes(20);
         } catch (RandomException) {
-            return new self($this->generateRandomToken()->value());
+            return $this->generateRandomToken();
         }
         return new self(bin2hex($bytes));
     }

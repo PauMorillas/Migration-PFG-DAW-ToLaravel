@@ -57,6 +57,7 @@ class PostController
                 $serviceId,
                 $dto->authUserId,
                 $request->only(array_keys(self::PREBOOKING_ATTRIBUTES)),
+                $request->user()->isCliente(),
             );
 
             $response = ($this->handler)($command);

@@ -14,7 +14,6 @@ use App\DDD\Backoffice\User\Domain\ValueObject\AuthUserId;
 
 readonly class CreatePreBookingCommand
 {
-    // ESTO TIENEN QUE SER VALUEOBJECTS
     public function __construct(
         public BusinessId $businessId,
         public ServiceId $serviceId,
@@ -25,6 +24,7 @@ readonly class CreatePreBookingCommand
         public Email $userEmail,
         public SpanishPhoneNumber $userPhone,
         public Password $userPass,
+        public bool $includeUser,
     )
     {
     }
@@ -33,7 +33,8 @@ readonly class CreatePreBookingCommand
         int $businessId,
         int $serviceId,
         int $authUserId,
-        array $data // TODO: Esto sería un payload ( BusinessRequestDTO )
+        array $data, // TODO: Esto sería un payload ( BusinessRequestDTO )
+        bool $includeUser,
     ): self {
         return new self (
             businessId: BusinessId::createFromInt($businessId),
@@ -45,6 +46,7 @@ readonly class CreatePreBookingCommand
             userEmail:  Email::createFromString($data['user_email']),
             userPhone:  SpanishPhoneNumber::createFromString($data['user_phone']),
             userPass: Password::createFromString($data['user_pass']),
+            includeUser: $includeUser,
         );
     }
 
