@@ -11,7 +11,7 @@ use App\DDD\Backoffice\Shared\ValueObject\SpanishPhoneNumber;
 use App\DDD\Backoffice\Shared\ValueObject\Text;
 use App\DDD\Backoffice\Shared\ValueObject\Uuid;
 use App\DDD\Backoffice\User\Domain\ValueObject\AuthUserId;
-use App\Models\Booking;
+use App\Models\User;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use JsonSerializable;
@@ -87,6 +87,24 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         );
     }
 
+    public static function fromEloquentModelWithUser(Model $model): self
+    {
+        return new self(
+            serviceId: ServiceId::createFromInt($model->service_id),
+            authUserId: AuthUserId::createFromInt($model->user->id),
+            startDate: BookingDate::createFromString($model->start_date),
+            endDate: BookingDate::createFromString($model->end_date),
+            userName: Text::createFromString($model->user->name),
+            userEmail: Text::createFromString($model->user->email),
+            userPass: Password::createFromString($model->user->password),
+            bookingToken: BookingToken::createFromString($model->token),
+            expirationDate: BookingDate::createFromString($model->expiration_date),
+            id: $model->id ? BookingId::createFromInt($model->id) : null,
+            uuid: $model->uuid ? Uuid::createFromString($model->uuid) : null,
+            userPhone: $model->user_phone ? SpanishPhoneNumber::createFromString($model->user->telephone) : null,
+        );
+    }
+
     public static function getEloquentModel(): Model
     {
         return new class () extends Model {
@@ -109,6 +127,10 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
                 'user_phone',
                 'user_pass',
             ];
+
+            public function user() {
+                return $this->belongsTo(User::class);
+            }
         };
     }
 

@@ -10,6 +10,6 @@ class UnauthorizedException extends AppException
     public function __construct()
     {
         $this->statusCode = Response::HTTP_UNAUTHORIZED;
-        parent::__construct('No puedes modificar datos en este recurso');
+        parent::__construct('No puedes modificar ni acceder a datos en este recurso');
     }
 }

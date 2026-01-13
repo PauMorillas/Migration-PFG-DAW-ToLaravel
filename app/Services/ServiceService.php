@@ -37,7 +37,7 @@ readonly class ServiceService
     }
 
     public
-    function findById(int $businessId, $serviceId): ?ServiceResponse
+    function findById(int $businessId, int $serviceId): ?ServiceResponse
     {
         // TODO: ¿Es correcto? llamar al service en vez de al repo y
         // volver a validar la existencia, lanzar excepcion, etc. Yo diría que si

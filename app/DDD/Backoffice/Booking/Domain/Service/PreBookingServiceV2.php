@@ -7,7 +7,6 @@ use App\DDD\Backoffice\Booking\Domain\Repository\PreBookingRepositoryV2Interface
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingDate;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingId;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingToken;
-use App\DDD\Backoffice\Booking\Infrastructure\Persistence\EloquentPreBookingRepository;
 use App\DDD\Backoffice\Business\Domain\ValueObject\BusinessId;
 use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
 use App\DDD\Backoffice\Shared\ValueObject\Password;
@@ -17,8 +16,9 @@ use App\DDD\Backoffice\Shared\ValueObject\Uuid;
 use App\DDD\Backoffice\User\Domain\ValueObject\AuthUserId;
 use App\DTO\Booking\BookingRequestDTO;
 use App\DTO\Booking\BookingResponseDTO;
+use App\Exceptions\BookingDoesntBelongToServiceException;
+use App\Exceptions\BookingNotFoundException;
 use App\Repositories\Contracts\BookingRepositoryInterface;
-use App\Repositories\Contracts\PreBookingRepositoryInterface;
 use App\Services\BusinessService;
 use App\Services\ServiceService;
 use Random\RandomException;
@@ -44,7 +44,6 @@ final readonly class PreBookingServiceV2
         $this->serviceService->findById($businessId->value(), $bookingRequestDTO->serviceId);
         $this->businessService->assertUserCanModifyBusiness($businessId->value(), $authUserId->value());
 
-        // todo: el modelo no tiene token hay que hacerlo ahora
         $payload = $bookingRequestDTO->toArray()
             + [
                 'token' => $this->generateRandomToken(),
@@ -54,6 +53,23 @@ final readonly class PreBookingServiceV2
         $preBooking = $this->mapPreBooking($payload, $authUserId);
 
         $this->preBookingRepository->create($preBooking);
+
+        return BookingResponseDTO::createFromDDDPreBookingModel($preBooking, $includeUser);
+    }
+
+    public function findById(BusinessId $businessId, ServiceId $serviceId, BookingId $bookingId,
+                             AuthUserId $authUserId, bool $includeUser): BookingResponseDTO
+    {
+        $serviceIdValue = $serviceId->value();
+        // Esta función valida que el negocio existe y
+        // que el service pertencece al business por eso la usaré
+        $this->businessService->assertUserCanModifyBusiness($businessId->value(), $authUserId->value());
+
+        $this->serviceService->findById($businessId->value(), $serviceIdValue);
+
+        $preBooking = $this->getPreBookingModelWithUserOrFail($bookingId);
+
+        $this->assertPreBookingBelongsToService($preBooking, $serviceIdValue);
 
         return BookingResponseDTO::createFromDDDPreBookingModel($preBooking, $includeUser);
     }
@@ -77,7 +93,6 @@ final readonly class PreBookingServiceV2
             endDate: BookingDate::createfromString($payload['end_date']),
             userName: Text::createFromString($payload['user_name']),
             userEmail: Text::createFromString($payload['user_email']),
-            userPhone: SpanishPhoneNumber::createFromString($payload['user_phone']),
             userPass: Password::createFromString($payload['user_pass']),
             bookingToken: BookingToken::createFromString($payload['token']),
             expirationDate: BookingDate::createfromString($payload['expiration_date']),
@@ -87,6 +102,37 @@ final readonly class PreBookingServiceV2
             uuid: isset($payload['uuid'])
                 ? Uuid::createFromString($payload['uuid'])
                 : Uuid::random(),
+            userPhone: SpanishPhoneNumber::createFromString($payload['user_phone']),
         );
     }
+
+    private function getPreBookingModelOrFail(BookingId $bookingId): PreBooking
+    {
+        $preBooking = $this->preBookingRepository->findById($bookingId);
+
+        if (is_null($preBooking)) {
+            throw new BookingNotFoundException();
+        }
+
+        return $preBooking;
+    }
+
+    private function getPreBookingModelWithUserOrFail(BookingId $bookingId): PreBooking
+    {
+        $preBooking = $this->preBookingRepository->findByIdWithUser($bookingId);
+
+        if (is_null($preBooking)) {
+            throw new BookingNotFoundException();
+        }
+
+        return $preBooking;
+    }
+
+    private function assertPreBookingBelongsToService(PreBooking $preBooking, int $serviceId): void
+    {
+        if ($preBooking->getServiceId()->value() !== $serviceId) {
+            throw new BookingDoesntBelongToServiceException();
+        }
+    }
+
 }

@@ -14,7 +14,7 @@ use App\DDD\Backoffice\User\Domain\ValueObject\AuthUserId;
 
 readonly class CreatePreBookingCommand
 {
-    public function __construct(
+    protected function __construct(
         public BusinessId $businessId,
         public ServiceId $serviceId,
         public AuthUserId $authUserId,

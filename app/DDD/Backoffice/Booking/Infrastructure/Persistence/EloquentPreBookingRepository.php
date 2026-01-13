@@ -15,10 +15,33 @@ final readonly class EloquentPreBookingRepository implements PreBookingRepositor
 {
     public function findById(BookingId $bookingId): ?PreBooking
     {
-        $model = PreBooking::getEloquentModel()->newQuery()->find($bookingId->value());
+        $model = PreBooking::getEloquentModel()
+            ->newQuery()
+            ->find($bookingId->value());
 
         if (!is_null($model)) {
             return PreBooking::fromEloquentModel($model);
+        }
+
+        return null;
+    }
+
+    public function findByIdWithUser(BookingId $bookingId): ?PreBooking
+    {
+        $model = PreBooking::getEloquentModel()
+            ->newQuery()
+            ->with('user')
+            ->find($bookingId->value());
+
+        dd('ENTRÉ EN findByIdWithUser');
+
+        if (!$model || !$model->user) {
+            return null;
+        }
+
+
+        if (!is_null($model)) {
+            return PreBooking::fromEloquentModelWithUser($model);
         }
 
         return null;
