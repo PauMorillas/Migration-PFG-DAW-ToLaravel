@@ -9,6 +9,7 @@ use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingId;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingToken;
 use App\DDD\Backoffice\Business\Domain\ValueObject\BusinessId;
 use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
+use App\DDD\Backoffice\Shared\ValueObject\Email;
 use App\DDD\Backoffice\Shared\ValueObject\Password;
 use App\DDD\Backoffice\Shared\ValueObject\SpanishPhoneNumber;
 use App\DDD\Backoffice\Shared\ValueObject\Text;
@@ -92,7 +93,7 @@ final readonly class PreBookingServiceV2
             startDate: BookingDate::createfromString($payload['start_date']),
             endDate: BookingDate::createfromString($payload['end_date']),
             userName: Text::createFromString($payload['user_name']),
-            userEmail: Text::createFromString($payload['user_email']),
+            userEmail: Email::createFromString($payload['user_email']),
             userPass: Password::createFromString($payload['user_pass']),
             bookingToken: BookingToken::createFromString($payload['token']),
             expirationDate: BookingDate::createfromString($payload['expiration_date']),
