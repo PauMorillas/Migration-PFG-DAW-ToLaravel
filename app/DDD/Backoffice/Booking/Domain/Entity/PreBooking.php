@@ -204,7 +204,7 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         return $this->userEmail;
     }
 
-    public function getUserPhone(): SpanishPhoneNumber
+    public function getUserPhone(): ?SpanishPhoneNumber
     {
         return $this->userPhone;
     }

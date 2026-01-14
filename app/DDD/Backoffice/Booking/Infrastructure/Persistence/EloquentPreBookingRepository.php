@@ -14,6 +14,13 @@ use Illuminate\Support\Facades\Log;
 
 final readonly class EloquentPreBookingRepository implements PreBookingRepositoryV2Interface
 {
+
+    public function __construct(
+    )
+    {
+
+    }
+
     public function findById(BookingId $bookingId): ?PreBooking
     {
         $model = PreBooking::getEloquentModel()

@@ -3,20 +3,20 @@
 namespace App\DDD\Infrastructure\EntryPoints\Http\API\Booking;
 
 use App\DDD\Backoffice\Booking\Application\Command\CreatePreBookingCommand;
-use App\DDD\Backoffice\Booking\Application\Handler\CreatePreBookingHandler;
-use App\DDD\Backoffice\Business\Domain\ValueObject\BusinessId;
+use App\DDD\Backoffice\Shared\Infrastructure\Bus\CommandBusInterface;
 use App\DDD\Backoffice\User\Domain\Service\UserAuthService;
 use App\DTO\Booking\BookingRequestDTO;
 use App\Exceptions\AppException;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
-class PostController
+class PostControllerWithBus
 {
 
     Use ApiResponseTrait;
@@ -30,30 +30,29 @@ class PostController
         'user_pass' => 'contraseña',
     ];
 
-    public function __construct(private CreatePreBookingHandler $handler)
+    public function __construct()
     {
 
     }
 
-    // todo: el dto lleva value objects (en este caso no es necesario un DTO) además aqui les
-    // gusta mas hacer payloads que son básicamente lo que necesita el caso de uso para funcionar,
-    // y el command si lleva los ids, y el objeto dto dentro para no engorrar todo de datos, esa es
-    // la clave que no estaba entendiendo
-
-    // TODO: Realmente no es un command porque esta devolviendo un objeto de Respuesta - Debe ir en Query
     public function __invoke(int $businessId,
                              int $serviceId,
                              Request $request): JsonResponse
     {
         try {
-            $requestUser = UserAuthService::createFromRequest($request);
+            Mail::raw('Hola mundo', function ($m) {
+                $m->to('test@example.com')->subject('Test');
+            });
+
+            $authUser = UserAuthService::createFromAuth();
+
             $this->validateBookings($request);
 
             $dto = BookingRequestDTO::createFromArray(
                 $request->only(array_keys(self::PREBOOKING_ATTRIBUTES)),
                 $serviceId,
                 null,
-                $requestUser->getAuthUserId()->value(),
+                $authUser->getAuthUserId()->value(),
             );
 
             $command = CreatePreBookingCommand::fromPrimitives(
@@ -61,10 +60,11 @@ class PostController
                 $serviceId,
                 $dto->authUserId,
                 $request->only(array_keys(self::PREBOOKING_ATTRIBUTES)),
-                $requestUser->isCliente(),
+                $authUser->isCliente(),
             );
 
-            $response = ($this->handler)($command);
+            $bus = app(CommandBusInterface::class);
+            $response = $bus->dispatch($command);
 
             return $this->created($response);
         } catch (ValidationException $th) {

@@ -12,7 +12,7 @@ use App\DDD\Backoffice\Shared\ValueObject\SpanishPhoneNumber;
 use App\DDD\Backoffice\Shared\ValueObject\Text;
 use App\DDD\Backoffice\User\Domain\ValueObject\AuthUserId;
 
-readonly class CreatePreBookingCommand
+final readonly class CreatePreBookingCommand
 {
     protected function __construct(
         public BusinessId $businessId,

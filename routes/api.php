@@ -1,6 +1,7 @@
 <?php
 
 use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\PostController as PreBookingPostController;
+use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\PostControllerWithBus as PreBookingPostControllerWithBus;
 use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\GetController as PreBookingGetController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -92,7 +93,9 @@ Route::middleware('auth:sanctum')->group(function () {
         // Rutas de PreBookings Privadas
         /*Route::post('{businessId}/services/{serviceId}/bookings', [PreBookingController::class, 'create'])
             ->whereNumber(['businessId', 'serviceId']);*/
-        Route::post('{businessId}/services/{serviceId}/bookings', PreBookingPostController::class)
+
+        // Cambiar entre postcontroller sin bus y con bus
+        Route::post('{businessId}/services/{serviceId}/bookings', PreBookingPostControllerWithBus::class)
             ->whereNumber(['businessId', 'serviceId']);
         Route::delete('{businessId}/services/{serviceId}/bookings/{bookingId}', [PreBookingController::class, 'delete'])
             ->whereNumber(['businessId', 'serviceId', 'bookingId']);

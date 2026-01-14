@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\DDD\Backoffice\Booking\Domain\Repository\PreBookingRepositoryV2Interface;
 use App\DDD\Backoffice\Booking\Domain\Service\PreBookingServiceV2;
 use App\DDD\Backoffice\Booking\Infrastructure\Persistence\EloquentPreBookingRepository;
+use App\DDD\Backoffice\Shared\Domain\Mail\MailerInterface;
+use App\DDD\Backoffice\Shared\Infrastructure\Mail\LaravelMailer;
 use App\Repositories\Contracts\BookingRepositoryInterface;
 use App\Repositories\Contracts\PreBookingRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
@@ -53,6 +55,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             PreBookingRepositoryV2Interface::class,
             EloquentPreBookingRepository::class
+        );
+
+        $this->app->bind(
+            MailerInterface::class,
+            LaravelMailer::class
         );
     }
 
