@@ -71,16 +71,18 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
 
     public static function fromEloquentModel(Model $model): self
     {
+        $checkIfDateIsOnPast = false;
+
         return new self(
             serviceId: ServiceId::createFromInt($model->service_id),
             authUserId: AuthUserId::createFromInt($model->user_id),
-            startDate: BookingDate::createFromString($model->start_date),
-            endDate: BookingDate::createFromString($model->end_date),
+            startDate: BookingDate::createFromString($model->start_date, $checkIfDateIsOnPast),
+            endDate: BookingDate::createFromString($model->end_date, $checkIfDateIsOnPast),
             userName: Text::createFromString($model->user_name),
             userEmail: Text::createFromString($model->user_email),
             userPass: Password::createFromString($model->user_pass),
             bookingToken: BookingToken::createFromString($model->token),
-            expirationDate: BookingDate::createFromString($model->expiration_date),
+            expirationDate: BookingDate::createFromString($model->expiration_date, $checkIfDateIsOnPast),
             id: $model->id ? BookingId::createFromInt($model->id) : null,
             uuid: $model->uuid ? Uuid::createFromString($model->uuid) : null,
             userPhone: $model->user_phone ? SpanishPhoneNumber::createFromString($model->user_phone) : null,
@@ -89,16 +91,18 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
 
     public static function fromEloquentModelWithUser(Model $model): self
     {
+        $checkIfDateIsOnPast = false;
+
         return new self(
             serviceId: ServiceId::createFromInt($model->service_id),
             authUserId: AuthUserId::createFromInt($model->user->id),
-            startDate: BookingDate::createFromString($model->start_date),
-            endDate: BookingDate::createFromString($model->end_date),
+            startDate: BookingDate::createFromString($model->start_date, $checkIfDateIsOnPast),
+            endDate: BookingDate::createFromString($model->end_date, $checkIfDateIsOnPast),
             userName: Text::createFromString($model->user->name),
             userEmail: Text::createFromString($model->user->email),
             userPass: Password::createFromString($model->user->password),
             bookingToken: BookingToken::createFromString($model->token),
-            expirationDate: BookingDate::createFromString($model->expiration_date),
+            expirationDate: BookingDate::createFromString($model->expiration_date, $checkIfDateIsOnPast),
             id: $model->id ? BookingId::createFromInt($model->id) : null,
             uuid: $model->uuid ? Uuid::createFromString($model->uuid) : null,
             userPhone: $model->user_phone ? SpanishPhoneNumber::createFromString($model->user->telephone) : null,

@@ -9,11 +9,11 @@ final readonly class BookingDate extends Date
 {
     // El formato de las fechas de una reserva tiene formato distinto
     protected const FORMAT = 'Y-m-d H:i:s';
-    protected function __construct(string $date)
+    protected function __construct(string $date, ?bool $checkIfIsOnPast = true)
     {
-        parent::__construct($date);
+        parent::__construct($date, $checkIfIsOnPast);
 
-        if ($this->value->isPast()) {
+        if ($checkIfIsOnPast && $this->value->isPast()) {
             throw new BookingDateIsOnPastException();
         }
     }

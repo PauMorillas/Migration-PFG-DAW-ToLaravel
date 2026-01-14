@@ -71,7 +71,7 @@ final readonly class PreBookingServiceV2
 
         $this->assertPreBookingBelongsToService($preBooking, $serviceIdValue);
 
-        return BookingResponseDTO::createFromDDDPreBookingModel($preBooking, $includeUser);
+        return BookingResponseDTO::createFromDDDPreBookingModelWithUser($preBooking, $includeUser);
     }
 
     private function generateRandomToken(): string

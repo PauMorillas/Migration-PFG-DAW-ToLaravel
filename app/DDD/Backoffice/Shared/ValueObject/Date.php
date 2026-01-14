@@ -11,9 +11,11 @@ abstract readonly class Date
     // pero se permite sobrescribirlo (protected)
     protected const FORMAT = 'Y-m-d';
     protected Carbon $value;
+    protected bool $checkIfIsOnPast;
 
-    protected function __construct(string|Carbon $date)
+    protected function __construct(string|Carbon $date, ?bool $checkIfIsOnPast = true)
     {
+        $this->checkIfIsOnPast = $checkIfIsOnPast;
         // Si es Carbon, lo convertimos a string usando el formato de la clase
         // para pasarle la "prueba de fuego" de la validación.
         $dateAsString = $date instanceof Carbon
@@ -24,14 +26,14 @@ abstract readonly class Date
         $this->value = Carbon::createFromFormat(static::FORMAT, $dateAsString);
     }
 
-    public static function createFromString(string $date): static
+    public static function createFromString(string $date, ?bool $checkIfIsOnPast = true): static
     {
-        return new static($date);
+        return new static($date, $checkIfIsOnPast);
     }
 
-    public static function createFromCarbon(Carbon $date): static
+    public static function createFromCarbon(Carbon $date, ?bool $checkIfIsOnPast = true): static
     {
-        return new static($date);
+        return new static($date, $checkIfIsOnPast);
     }
 
     private function ensureIsValidDate(string $date): void

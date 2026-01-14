@@ -51,7 +51,7 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
             bookingId: $preBooking->getId()?->value(),
             status: null,
             userResponse: $includeUser
-            // todo: pasarle el usuario que hizo la request (este sería el comportamiento antiguo, antes de separar las entidades)
+            // todo: pasarle el usuario que hizo la request?? o el asociado a esa reserva (este sería el comportamiento antiguo, antes de separar las entidades)
                 ? UserResponseDTO::createFromDDDPreBooking(
                     $preBooking->getUserName(),
                     $preBooking->getUserEmail(),
@@ -61,13 +61,14 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
     }
 
     // TODO: VAS POR AKI
-    /* public static function createFromDDDPreBookingModelWithUser
+     public static function createFromDDDPreBookingModelWithUser
     (\App\DDD\Backoffice\Booking\Domain\Entity\PreBooking $preBooking,
      ?bool $includeUser = false): self
     {
+        $includeUser = true;
         $userResponse = $includeUser
-            ? UserResponseDTO::createFromPreBooking
-            ($preBooking->user_name, $user->user_email, $user->phone);
+            ? UserResponseDTO::createFromDDDPreBooking
+            ($preBooking->getUserName(), $preBooking->getUserEmail(), $preBooking->getUserPhone())
             : null;
 
         return new self(
@@ -76,11 +77,9 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
             endDate: $preBooking->getEndDate()->value(),
             bookingId: $preBooking->getId()?->value(),
             status: null,
-            userResponse: $includeUser
-                ? UserResponseDTO::createFromModel($user)
-                : null
+            userResponse: $userResponse,
         );
-    }*/
+    }
 
     public static function createFromBookingModel(Booking $booking, bool $includeUser): self
     {

@@ -10,6 +10,7 @@ use App\DDD\Backoffice\Business\Domain\ValueObject\BusinessId;
 use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 final readonly class EloquentPreBookingRepository implements PreBookingRepositoryV2Interface
 {
@@ -32,13 +33,6 @@ final readonly class EloquentPreBookingRepository implements PreBookingRepositor
             ->newQuery()
             ->with('user')
             ->find($bookingId->value());
-
-        dd('ENTRÉ EN findByIdWithUser');
-
-        if (!$model || !$model->user) {
-            return null;
-        }
-
 
         if (!is_null($model)) {
             return PreBooking::fromEloquentModelWithUser($model);
