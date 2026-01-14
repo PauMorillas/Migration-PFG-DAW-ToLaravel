@@ -2,6 +2,7 @@
 
 namespace Feature\Bookings;
 
+use App\DDD\Backoffice\Shared\ValueObject\Uuid;
 use App\Models\PreBooking;
 use App\Models\Service;
 use App\Repositories\Contracts\PreBookingRepositoryInterface;
@@ -28,6 +29,7 @@ class CountOverlappingPreBookingsRealDBTest extends TestCase
             'user_email' => 'juan.perez@email.com',
             'user_phone' => '600111222',
             'user_pass' => 'password123',
+            'uuid' => Uuid::random()->value()
         ]);
 
         // Booking 2: empieza dentro y termina después del periodo
@@ -41,6 +43,7 @@ class CountOverlappingPreBookingsRealDBTest extends TestCase
             'user_email' => 'maria.lopez@email.com',
             'user_phone' => '611333444',
             'user_pass' => 'password123',
+            'uuid' => Uuid::random()->value()
         ]);
 
         // Booking 3: fuera del periodo (no debería contarse)
@@ -54,6 +57,7 @@ class CountOverlappingPreBookingsRealDBTest extends TestCase
             'user_email' => 'carlos.ruiz@email.com',
             'user_phone' => '622555666',
             'user_pass' => 'password123',
+            'uuid' => Uuid::random()->value()
         ]);
 
         $repo = app(PreBookingRepositoryInterface::class);
