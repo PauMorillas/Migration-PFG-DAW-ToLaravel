@@ -6,6 +6,7 @@ use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingDate;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingId;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingToken;
 use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
+use App\DDD\Backoffice\Shared\ValueObject\Email;
 use App\DDD\Backoffice\Shared\ValueObject\Password;
 use App\DDD\Backoffice\Shared\ValueObject\SpanishPhoneNumber;
 use App\DDD\Backoffice\Shared\ValueObject\Text;
@@ -27,7 +28,7 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         private BookingDate        $endDate,
 
         private Text               $userName,
-        private Text               $userEmail,
+        private Email               $userEmail,
         private Password           $userPass,
         private BookingToken       $bookingToken,
         private BookingDate        $expirationDate,
@@ -44,7 +45,7 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         BookingDate        $startDate,
         BookingDate        $endDate,
         Text               $userName,
-        Text               $userEmail,
+        Email               $userEmail,
         Password           $userPass,
         BookingToken       $bookingToken,
         BookingDate        $expirationDate,
@@ -79,7 +80,7 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
             startDate: BookingDate::createFromString($model->start_date, $checkIfDateIsOnPast),
             endDate: BookingDate::createFromString($model->end_date, $checkIfDateIsOnPast),
             userName: Text::createFromString($model->user_name),
-            userEmail: Text::createFromString($model->user_email),
+            userEmail: Email::createFromString($model->user_email),
             userPass: Password::createFromString($model->user_pass),
             bookingToken: BookingToken::createFromString($model->token),
             expirationDate: BookingDate::createFromString($model->expiration_date, $checkIfDateIsOnPast),
@@ -99,7 +100,7 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
             startDate: BookingDate::createFromString($model->start_date, $checkIfDateIsOnPast),
             endDate: BookingDate::createFromString($model->end_date, $checkIfDateIsOnPast),
             userName: Text::createFromString($model->user->name),
-            userEmail: Text::createFromString($model->user->email),
+            userEmail: Email::createFromString($model->user->email),
             userPass: Password::createFromString($model->user->password),
             bookingToken: BookingToken::createFromString($model->token),
             expirationDate: BookingDate::createFromString($model->expiration_date, $checkIfDateIsOnPast),
