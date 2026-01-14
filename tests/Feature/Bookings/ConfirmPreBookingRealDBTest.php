@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Bookings;
 
+use App\DDD\Backoffice\Shared\ValueObject\Uuid;
 use App\DTO\Booking\BookingResponseDTO;
 use App\Exceptions\PreBookingExpiredException;
 use App\Models\PreBooking;
@@ -30,6 +31,7 @@ class ConfirmPreBookingRealDBTest extends TestCase
             'user_email' => $user->email,
             'user_phone' => $user->telephone,
             'user_pass' => 'hashed',
+            'uuid' => Uuid::random()->value(),
         ]);
 
         $serviceLayer = app(PreBookingService::class);
@@ -69,6 +71,7 @@ class ConfirmPreBookingRealDBTest extends TestCase
             'user_email' => $user->email,
             'user_phone' => $user->telephone,
             'user_pass' => 'hashed',
+            'uuid' => Uuid::random()->value(),
         ]);
 
         $this->expectException(PreBookingExpiredException::class);

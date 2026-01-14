@@ -15,6 +15,7 @@ return new Class extends Migration {
             $table->string('user_email');
             $table->string('user_phone');
             $table->string('user_pass');
+            $table->uuid(); // Por defecto le pone 'uuid'
 
             // La tabla que tendrá la relación no será esta será bookings
             // esta entidad pretende ser una entidad intermedia para poder lograr bloqueos temporales

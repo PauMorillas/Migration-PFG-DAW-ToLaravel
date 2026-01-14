@@ -14,10 +14,11 @@ use stdClass;
 class BookingResponseDTO implements Arrayable, JsonSerializable
 {
 
-    public function __construct(private ?int             $bookingId,
+    public function __construct(
                                 private int              $serviceId,
                                 private string           $startDate,
                                 private string           $endDate,
+                                private ?int             $bookingId,
                                 private ?BookingStatus   $status = null,
                                 private ?UserResponseDTO $userResponse = null,)
     {
@@ -27,10 +28,10 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
     public static function createFromPreBookingModel(PreBooking $booking, ?bool $includeUser = false): self
     {
         return new self(
-            bookingId: $booking->id,
             serviceId: $booking->service_id,
             startDate: $booking->start_date,
             endDate: $booking->end_date,
+            bookingId: $booking->id,
             status: null,
             userResponse: $includeUser && $booking->user
                 ? UserResponseDTO::createFromPreBooking($booking->user_name,
@@ -39,13 +40,54 @@ class BookingResponseDTO implements Arrayable, JsonSerializable
         );
     }
 
+    public static function createFromDDDPreBookingModel
+    (\App\DDD\Backoffice\Booking\Domain\Entity\PreBooking $preBooking,
+     ?bool $includeUser = false): self
+    {
+        return new self(
+            serviceId: $preBooking->getServiceId()->value(),
+            startDate: $preBooking->getStartDate()->value(),
+            endDate: $preBooking->getEndDate()->value(),
+            bookingId: $preBooking->getId()?->value(),
+            status: null,
+            userResponse: $includeUser
+            // todo: pasarle el usuario que hizo la request?? o el asociado a esa reserva (este sería el comportamiento antiguo, antes de separar las entidades)
+                ? UserResponseDTO::createFromDDDPreBooking(
+                    $preBooking->getUserName(),
+                    $preBooking->getUserEmail(),
+                    $preBooking->getUserPhone() ?? null)
+                : null
+        );
+    }
+
+    // TODO: VAS POR AKI
+     public static function createFromDDDPreBookingModelWithUser
+    (\App\DDD\Backoffice\Booking\Domain\Entity\PreBooking $preBooking,
+     ?bool $includeUser = false): self
+    {
+        $includeUser = true;
+        $userResponse = $includeUser
+            ? UserResponseDTO::createFromDDDPreBooking
+            ($preBooking->getUserName(), $preBooking->getUserEmail(), $preBooking->getUserPhone())
+            : null;
+
+        return new self(
+            serviceId: $preBooking->getServiceId()->value(),
+            startDate: $preBooking->getStartDate()->value(),
+            endDate: $preBooking->getEndDate()->value(),
+            bookingId: $preBooking->getId()?->value(),
+            status: null,
+            userResponse: $userResponse,
+        );
+    }
+
     public static function createFromBookingModel(Booking $booking, bool $includeUser): self
     {
         return new self(
-            bookingId: $booking->id,
             serviceId: $booking->service_id,
             startDate: $booking->start_date,
             endDate: $booking->end_date,
+            bookingId: $booking->id,
             status: $booking->status,
             userResponse: $includeUser && $booking->user
                 ? UserResponseDTO::createFromModel($booking->user)

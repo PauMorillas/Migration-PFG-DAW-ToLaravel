@@ -26,6 +26,7 @@ class PreBooking extends Model
         'user_email',
         'user_phone',
         'user_pass',
+        'uuid'
     ];
 
     public function service(): BelongsTo {

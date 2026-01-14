@@ -7,11 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UnauthorizedException extends AppException
 {
-
-    protected int $statusCode = Response::HTTP_UNAUTHORIZED;
-
     public function __construct()
     {
-        parent::__construct('No puedes modificar datos en este recurso');
+        $this->statusCode = Response::HTTP_UNAUTHORIZED;
+        parent::__construct('No puedes modificar ni acceder a datos en este recurso');
     }
 }

@@ -1,5 +1,8 @@
 <?php
 
+use App\Providers\CommandBusServiceProvider;
+use Illuminate\Support\ServiceProvider;
+
 return [
 
     /*
@@ -123,4 +126,13 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Registro de providers
+    |--------------------------------------------------------------------------
+    |
+     */
+    'providers' => ServiceProvider::defaultProviders()->merge([
+        CommandBusServiceProvider::class,
+    ])->toArray(),
 ];
