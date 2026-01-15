@@ -8,14 +8,14 @@ final readonly class MailMessage
         protected string $to,
         protected string $subject,
         protected string $view,
-        protected array $data = [],
+        protected array  $data = [],
     )
     {
     }
 
     public static function create
-    (string $to, string $subject, string $view, array $data)
-    : self {
+    (string $to, string $subject, string $view, array $data): self
+    {
         return new self($to, $subject, $view, $data);
     }
 

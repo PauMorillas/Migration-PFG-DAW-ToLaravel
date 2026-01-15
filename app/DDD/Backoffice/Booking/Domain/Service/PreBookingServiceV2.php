@@ -9,6 +9,8 @@ use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingId;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingToken;
 use App\DDD\Backoffice\Business\Domain\ValueObject\BusinessId;
 use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
+use App\DDD\Backoffice\Shared\Domain\Entity\Mail\MailMessage;
+use App\DDD\Backoffice\Shared\Domain\Mail\MailerServiceInterface;
 use App\DDD\Backoffice\Shared\ValueObject\Email;
 use App\DDD\Backoffice\Shared\ValueObject\Password;
 use App\DDD\Backoffice\Shared\ValueObject\SpanishPhoneNumber;
@@ -33,7 +35,8 @@ final readonly class PreBookingServiceV2
         private PreBookingRepositoryV2Interface $preBookingRepository,
         private BookingRepositoryInterface      $bookingRepository,
         private ServiceService                  $serviceService,
-        private BusinessService                 $businessService
+        private BusinessService                 $businessService,
+        private MailerServiceInterface          $mailerService,
     )
     {
 
@@ -55,6 +58,17 @@ final readonly class PreBookingServiceV2
 
         $this->preBookingRepository->create($preBooking);
 
+        $data = [
+            'user_name' => $preBooking->getUsername()->value(),
+            'confirmation_link' => null,
+            'start_date' => $preBooking->getStartDate()->value(),
+            'end_date' => $preBooking->getEndDate()->value(),
+        ];
+
+        // Aqui hacer el dispatch del job
+        // cómo hago un dispatch de un job?
+        $this->sendConfirmationMail($preBooking->getUserEmail()->value(), $data);
+
         return BookingResponseDTO::createFromDDDPreBookingModel($preBooking, $includeUser);
     }
 
@@ -73,6 +87,12 @@ final readonly class PreBookingServiceV2
         $this->assertPreBookingBelongsToService($preBooking, $serviceIdValue);
 
         return BookingResponseDTO::createFromDDDPreBookingModelWithUser($preBooking, $includeUser);
+    }
+
+    public function delete(BookingId $bookingId, BusinessId $businessId, ServiceId $serviceId)
+    {
+        $prebooking = $this->getPreBookingModelOrFail($bookingId);
+        $this->preBookingRepository->delete();
     }
 
     private function generateRandomToken(): string
@@ -134,6 +154,35 @@ final readonly class PreBookingServiceV2
         if ($preBooking->getServiceId()->value() !== $serviceId) {
             throw new BookingDoesntBelongToServiceException();
         }
+    }
+
+    private function createMail(
+        string $to,
+        string $subject,
+        string $view,
+        array $data,
+    ): MailMessage {
+        return MailMessage::create(
+            to: $to,
+            subject: $subject,
+            view: $view,
+            data: $data
+        );
+    }
+
+    private function sendConfirmationMail(
+        string $email,
+        array $data,
+        ?string $view = 'emails.confirm-prebooking'
+    ): void {
+        $mail = $this->createMail(
+            to: $email,
+            subject: 'Confirma tu reserva',
+            view: $view,
+            data: $data,
+        );
+
+        $this->mailerService->sendAsync($mail);
     }
 
 }

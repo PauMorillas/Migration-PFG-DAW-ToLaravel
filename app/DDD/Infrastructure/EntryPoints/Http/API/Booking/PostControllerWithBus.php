@@ -40,10 +40,6 @@ class PostControllerWithBus
                              Request $request): JsonResponse
     {
         try {
-            Mail::raw('Hola mundo', function ($m) {
-                $m->to('test@example.com')->subject('Test');
-            });
-
             $authUser = UserAuthService::createFromAuth();
 
             $this->validateBookings($request);

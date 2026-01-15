@@ -2,7 +2,7 @@
 
 namespace App\DDD\Backoffice\Shared\Infrastructure\Bus;
 
-use http\Exception\RuntimeException;
+use Exception;
 
 final readonly class SimpleCommandBus implements CommandBusInterface
 {
@@ -19,7 +19,7 @@ final readonly class SimpleCommandBus implements CommandBusInterface
         $commandClass = $command::class;
 
         if(!isset($this->handlers[$commandClass])) {
-            throw new RuntimeException("No handler for command $commandClass");
+            throw new Exception("No handler for command $commandClass");
         }
 
         // Llama al handler correspondiente pasando el command
