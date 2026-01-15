@@ -92,7 +92,7 @@ final readonly class PreBookingServiceV2
     public function delete(BookingId $bookingId, BusinessId $businessId, ServiceId $serviceId)
     {
         $prebooking = $this->getPreBookingModelOrFail($bookingId);
-        $this->preBookingRepository->delete();
+        $this->preBookingRepository->delete($prebooking);
     }
 
     private function generateRandomToken(): string
@@ -182,7 +182,7 @@ final readonly class PreBookingServiceV2
             data: $data,
         );
 
-        $this->mailerService->sendAsync($mail);
+        $this->mailerService->send($mail);
     }
 
 }

@@ -4,14 +4,17 @@ namespace App\DDD\Backoffice\Shared\Infrastructure\Service\Mail;
 
 use App\DDD\Backoffice\Shared\Domain\Entity\Mail\MailMessage;
 use App\DDD\Backoffice\Shared\Domain\Mail\MailerServiceInterface;
-use App\Jobs\SendBookingConfirmationEmail;
+use App\Jobs\SendMailJob;
 use Illuminate\Support\Facades\Mail;
 
 final readonly class MailerService implements MailerServiceInterface
 {
 
-    // Método que usa el Job
-    public function send(MailMessage $message): void
+    /**
+     * Acción REAL de enviar mail
+     * (Funcion que usa el Job)
+     */
+    public function sendAction(MailMessage $message): void
     {
         Mail::send(
             $message->getView(),
@@ -24,11 +27,19 @@ final readonly class MailerService implements MailerServiceInterface
         );
     }
 
-    public function sendAsync(MailMessage $message): void {
-        SendBookingConfirmationEmail::dispatch($message)->onQueue('emails');
+    private function sendAsync(MailMessage $message): void
+    {
+        SendMailJob::dispatch($message)
+            ->onQueue('emails');
     }
 
-    public function sendSync(MailMessage $message): void {
-        $this->send($message);
+    public function send(MailMessage $message, bool $async = true): void
+    {
+        if ($async) {
+            $this->sendAsync($message);
+            return;
+        }
+
+        SendMailJob::dispatchSync($message);
     }
 }

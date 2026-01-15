@@ -7,8 +7,6 @@ use App\DDD\Backoffice\Shared\Domain\Entity\Mail\MailMessage;
 
 interface MailerServiceInterface
 {
-    public function send(MailMessage $message): void;
-    public function sendAsync(MailMessage $message): void;
-    public function sendSync(MailMessage $message): void;
-
+    public function send(MailMessage $message, bool $async = true): void;
+    public function sendAction(MailMessage $message): void;
 }

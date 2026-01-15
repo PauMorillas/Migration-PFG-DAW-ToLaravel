@@ -10,7 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-final class SendBookingConfirmationEmail implements ShouldQueue
+final class SendMailJob implements ShouldQueue
 {
     use Queueable, Dispatchable, InteractsWithQueue, SerializesModels;
 
@@ -38,9 +38,10 @@ final class SendBookingConfirmationEmail implements ShouldQueue
     {
         // TODO: Aquí va el envío del Mail
         // En otro caso se llama al command de enviar mail
-        $mailerService->send($this->mailMessage);
+        $mailerService->sendAction($this->mailMessage);
 
         // TODO: AL NECESITAR EJECUTAR EL JOB DE MANERA SÍNCRONA O ASÍNCRONA
         // DESDE FUERA DEL JOB LO QUE HICE FUE EJECUTAR SOLO LA ACCION de Enviar
+        // desde el servicio
     }
 }
