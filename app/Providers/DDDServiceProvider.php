@@ -13,11 +13,13 @@ use App;
 class DDDServiceProvider extends ServiceProvider
 {
 
-    protected function __construct()
-    {
-        // App es un atributo de la clase ServiceProvider
-        parent::__construct($this->app);
-    }
+    // TODO: REALMENTE EL CONSTRUCTOR ES NECESARIO AQUI??
+    // no me funcionaba con:
+    /*
+     * protected function __construct() {
+     *      parent::__construct($this->app); // Pero esto era null
+     * }
+     * */
 
     public function register(): void {
         // Buses

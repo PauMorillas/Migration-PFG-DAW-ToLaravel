@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Bookings;
+namespace Tests\Feature\Bookings;
 
 use App\DDD\Backoffice\Shared\ValueObject\Uuid;
 use App\Models\PreBooking;
