@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\DDD\Backoffice\Booking\Application\Command\CreatePreBookingCommand;
+use App\DDD\Backoffice\Booking\Application\Command\DeletePreBookingCommand;
 use App\DDD\Backoffice\Booking\Application\Command\FindByIdPreBookingCommand;
 use App\DDD\Backoffice\Booking\Application\Handler\CreatePreBookingHandler;
+use App\DDD\Backoffice\Booking\Application\Handler\DeletePreBookingHandler;
 use App\DDD\Backoffice\Booking\Application\Handler\FindByIdPreBookingHandler;
 use App\DDD\Backoffice\Shared\Infrastructure\Bus\CommandBusInterface;
 use App\DDD\Backoffice\Shared\Infrastructure\Bus\SimpleCommandBus;
@@ -22,6 +24,9 @@ class CommandBusServiceProvider extends ServiceProvider
 
                 FindByIdPreBookingCommand::class =>
                 $app->make(FindByIdPreBookingHandler::class),
+
+                DeletePreBookingCommand::class =>
+                $app->make(DeletePreBookingHandler::class),
             ]);
         });
     }
