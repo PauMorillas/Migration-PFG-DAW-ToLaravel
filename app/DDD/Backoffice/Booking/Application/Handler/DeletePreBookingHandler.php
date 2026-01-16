@@ -18,6 +18,7 @@ final readonly class DeletePreBookingHandler
             $command->getBookingId(),
             $command->getBusinessId(),
             $command->getServiceId(),
+            $command->getAuthUserId()
         );
     }
 }

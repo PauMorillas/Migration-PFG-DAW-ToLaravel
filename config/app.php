@@ -1,6 +1,7 @@
 <?php
 
 use App\Providers\CommandBusServiceProvider;
+use App\Providers\DDDServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
 return [
@@ -134,5 +135,7 @@ return [
      */
     'providers' => ServiceProvider::defaultProviders()->merge([
         CommandBusServiceProvider::class,
+        // Provider de DDD
+        DDDServiceProvider::class,
     ])->toArray(),
 ];

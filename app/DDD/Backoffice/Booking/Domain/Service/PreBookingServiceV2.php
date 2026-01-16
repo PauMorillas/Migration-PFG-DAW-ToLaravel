@@ -89,9 +89,13 @@ final readonly class PreBookingServiceV2
         return BookingResponseDTO::createFromDDDPreBookingModelWithUser($preBooking, $includeUser);
     }
 
-    public function delete(BookingId $bookingId, BusinessId $businessId, ServiceId $serviceId)
+    public function delete(BookingId $bookingId, BusinessId $businessId, ServiceId $serviceId, AuthUserId $authUserId): void
     {
+        $this->businessService->assertUserCanModifyBusiness($businessId->value(), $authUserId->value());
+        $this->serviceService->findById($businessId->value(), $serviceId->value());
+
         $prebooking = $this->getPreBookingModelOrFail($bookingId);
+
         $this->preBookingRepository->delete($prebooking);
     }
 
@@ -156,6 +160,8 @@ final readonly class PreBookingServiceV2
         }
     }
 
+
+    // TODO: DEBERIA IR EN UN SERVICIO APARTE QUE SEA UN MAIL CREATOR
     private function createMail(
         string $to,
         string $subject,
