@@ -2,13 +2,16 @@
 
 namespace App\DDD\Backoffice\Booking\Domain\Service;
 
+use App\DDD\Backoffice\Booking\Domain\Command\SendConfirmationMailCommand;
 use App\DDD\Backoffice\Booking\Domain\Entity\PreBooking;
+use App\DDD\Backoffice\Booking\Domain\Handler\SendConfirmationMailHandler;
 use App\DDD\Backoffice\Booking\Domain\Repository\PreBookingRepositoryV2Interface;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingDate;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingId;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingToken;
 use App\DDD\Backoffice\Business\Domain\ValueObject\BusinessId;
 use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
+use App\DDD\Backoffice\Shared\Domain\Bus\AsyncCommandBusInterface;
 use App\DDD\Backoffice\Shared\Domain\Entity\Mail\MailMessage;
 use App\DDD\Backoffice\Shared\Domain\Mail\MailerServiceInterface;
 use App\DDD\Backoffice\Shared\ValueObject\Email;
@@ -38,9 +41,7 @@ final readonly class PreBookingServiceV2
         private BusinessService                 $businessService,
         private MailerServiceInterface          $mailerService,
     )
-    {
-
-    }
+    {}
 
     public function create(BusinessId $businessId, BookingRequestDTO $bookingRequestDTO,
                            AuthUserId $authUserId, bool $includeUser): BookingResponseDTO
@@ -67,7 +68,12 @@ final readonly class PreBookingServiceV2
 
         // Aqui hacer el dispatch del job
         // cómo hago un dispatch de un job?
-        $this->sendConfirmationMail($preBooking->getUserEmail()->value(), $data);
+        /*$this->sendConfirmationMail($preBooking->getUserEmail()->value(), $data);*/
+        $handler = new SendConfirmationMailHandler($this->mailerService);
+        $command = SendConfirmationMailCommand::createFromValueObjects
+        ($preBooking->getUserEmail(), $data);
+
+        $handler($command);
 
         return BookingResponseDTO::createFromDDDPreBookingModel($preBooking, $includeUser);
     }

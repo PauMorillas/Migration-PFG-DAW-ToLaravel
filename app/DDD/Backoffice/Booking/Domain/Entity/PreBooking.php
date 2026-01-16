@@ -199,7 +199,7 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         return $this->userName;
     }
 
-    public function getUserEmail(): Text
+    public function getUserEmail(): Email
     {
         return $this->userEmail;
     }

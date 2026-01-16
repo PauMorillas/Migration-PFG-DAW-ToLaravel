@@ -3,6 +3,8 @@
 namespace App\DDD\Infrastructure\EntryPoints\Http\API\Booking;
 
 use App\DDD\Backoffice\Booking\Application\Command\CreatePreBookingCommand;
+use App\DDD\Backoffice\Booking\Domain\Command\SendConfirmationMailCommand;
+use App\DDD\Backoffice\Shared\Domain\Bus\AsyncCommandBusInterface;
 use App\DDD\Backoffice\Shared\Infrastructure\Bus\CommandBusInterface;
 use App\DDD\Backoffice\User\Domain\Service\UserAuthService;
 use App\DTO\Booking\BookingRequestDTO;
@@ -58,6 +60,7 @@ class PostControllerWithBus
                 $request->only(array_keys(self::PREBOOKING_ATTRIBUTES)),
                 $authUser->isCliente(),
             );
+
 
             $bus = app(CommandBusInterface::class);
             $response = $bus->dispatch($command);

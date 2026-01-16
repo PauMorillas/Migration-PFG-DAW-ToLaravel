@@ -20,7 +20,7 @@ final readonly class SendConfirmationMailHandler
 
     private function sendConfirmationMail($command): void {
         $mailMessage = MailFactory::preBookingConfirmation
-        ($command->getEmail()->value(), $command->getData()->value());
+        ($command->getEmail(), $command->getData());
 
         $this->mailer->send($mailMessage);
     }
