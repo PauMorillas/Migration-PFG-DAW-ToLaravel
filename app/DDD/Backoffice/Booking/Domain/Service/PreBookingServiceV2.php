@@ -66,8 +66,6 @@ final readonly class PreBookingServiceV2
             'end_date' => $preBooking->getEndDate()->value(),
         ];
 
-        // Aqui hacer el dispatch del job
-        // cómo hago un dispatch de un job?
         /*$this->sendConfirmationMail($preBooking->getUserEmail()->value(), $data);*/
         $handler = new SendConfirmationMailHandler($this->mailerService);
         $command = SendConfirmationMailCommand::createFromValueObjects
@@ -165,36 +163,4 @@ final readonly class PreBookingServiceV2
             throw new BookingDoesntBelongToServiceException();
         }
     }
-
-
-    // TODO: DEBERIA IR EN UN SERVICIO APARTE QUE SEA UN MAIL CREATOR
-    private function createMail(
-        string $to,
-        string $subject,
-        string $view,
-        array $data,
-    ): MailMessage {
-        return MailMessage::create(
-            to: $to,
-            subject: $subject,
-            view: $view,
-            data: $data
-        );
-    }
-
-    private function sendConfirmationMail(
-        string $email,
-        array $data,
-        ?string $view = 'emails.confirm-prebooking'
-    ): void {
-        $mail = $this->createMail(
-            to: $email,
-            subject: 'Confirma tu reserva',
-            view: $view,
-            data: $data,
-        );
-
-        $this->mailerService->send($mail);
-    }
-
 }

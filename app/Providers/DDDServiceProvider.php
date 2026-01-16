@@ -13,7 +13,7 @@ use App;
 class DDDServiceProvider extends ServiceProvider
 {
 
-    // TODO: REALMENTE EL CONSTRUCTOR ES NECESARIO AQUI??
+    // TODO: REALMENTE EL CONSTRUCTOR ES NECESARIO AQUÍ??
     // no me funcionaba con:
     /*
      * protected function __construct() {
