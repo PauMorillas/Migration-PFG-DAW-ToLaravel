@@ -4,7 +4,7 @@ namespace App\DDD\Infrastructure\EntryPoints\Http\API\Booking;
 
 use App\DDD\Backoffice\Booking\Application\Command\DeletePreBookingCommand;
 use App\DDD\Backoffice\Booking\Application\Handler\DeletePreBookingHandler;
-use App\DDD\Backoffice\Shared\Infrastructure\Bus\CommandBusInterface;
+use App\DDD\Backoffice\Shared\Domain\Bus\CommandBusInterface;
 use App\DDD\Backoffice\User\Domain\Service\UserAuthService;
 use App\Exceptions\AppException;
 use App\Traits\ApiResponseTrait;

@@ -2,13 +2,11 @@
 
 namespace App\DDD\Backoffice\Booking\Application\Command;
 
-use App\DDD\Backoffice\Booking\Application\Handler\CreatePreBookingHandler;
 use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingDate;
 use App\DDD\Backoffice\Business\Domain\ValueObject\BusinessId;
 use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
 use App\DDD\Backoffice\Shared\ValueObject\Email;
 use App\DDD\Backoffice\Shared\ValueObject\Password;
-use App\DDD\Backoffice\Shared\ValueObject\PhoneNumber;
 use App\DDD\Backoffice\Shared\ValueObject\SpanishPhoneNumber;
 use App\DDD\Backoffice\Shared\ValueObject\Text;
 use App\DDD\Backoffice\User\Domain\ValueObject\AuthUserId;

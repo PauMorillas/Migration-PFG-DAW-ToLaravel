@@ -49,17 +49,6 @@ class AppServiceProvider extends ServiceProvider
             BookingRepositoryInterface::class,
             BookingRepository::class
         );
-
-        // Repo de la parte hecha aplicando DDD
-        $this->app->bind(
-            PreBookingRepositoryV2Interface::class,
-            EloquentPreBookingRepository::class
-        );
-
-        $this->app->bind(
-            MailerServiceInterface::class,
-            MailerService::class
-        );
     }
 
     /**

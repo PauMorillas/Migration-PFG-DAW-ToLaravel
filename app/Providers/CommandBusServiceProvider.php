@@ -9,8 +9,8 @@ use App\DDD\Backoffice\Booking\Application\Handler\CreatePreBookingHandler;
 use App\DDD\Backoffice\Booking\Application\Handler\DeletePreBookingHandler;
 use App\DDD\Backoffice\Booking\Application\Handler\FindByIdPreBookingHandler;
 use App\DDD\Backoffice\Shared\Domain\Bus\AsyncCommandBusInterface;
-use App\DDD\Backoffice\Shared\Infrastructure\Bus\CommandBusInterface;
-use App\DDD\Backoffice\Shared\Infrastructure\Bus\LaravelAsyncCommandBus;
+use App\DDD\Backoffice\Shared\Domain\Bus\CommandBusInterface;
+use App\DDD\Backoffice\Shared\Domain\Bus\SyncCommandBusInterface;
 use App\DDD\Backoffice\Shared\Infrastructure\Bus\SimpleCommandBus;
 use Illuminate\Support\ServiceProvider;
 
@@ -32,7 +32,6 @@ class CommandBusServiceProvider extends ServiceProvider
             ]);
         });
 
-        $this->app->singleton(AsyncCommandBusInterface::class);
     }
 
     public function boot() {

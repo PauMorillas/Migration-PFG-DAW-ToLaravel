@@ -2,9 +2,10 @@
 
 namespace App\DDD\Backoffice\Shared\Infrastructure\Provider;
 
-// TODO IMPORTAR LA CLASE Application, no se cual de todas es
-use App\DDD\Backoffice\Shared\Infrastructure\Bus\CommandBusInterface;
+use App\DDD\Backoffice\Shared\Domain\Bus\AsyncCommandBusInterface;
+use App\DDD\Backoffice\Shared\Domain\Bus\SyncCommandBusInterface;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Bus;
 
 abstract class AbstractDDDServiceProvider
 {
@@ -24,8 +25,12 @@ abstract class AbstractDDDServiceProvider
         return $this->app;
     }
 
-    protected function getCommandBus(): CommandBusInterface {
-        return $this->app->get(CommandBusInterface::class);
+    public function getCommandBus(): SyncCommandBusInterface {
+        return $this->app->get(SyncCommandBusInterface::class);
+    }
+
+    public function getAsyncCommandBus(): AsyncCommandBusInterface {
+        return $this->app->get(AsyncCommandBusInterface::class);
     }
 
     protected function mapQueries(): void {
@@ -34,6 +39,10 @@ abstract class AbstractDDDServiceProvider
 
     protected function mapCommands(): void {
 
+    }
+
+    protected function registerCommands(array $map): void {
+        Bus::map($map);
     }
 
     public function boot(): void

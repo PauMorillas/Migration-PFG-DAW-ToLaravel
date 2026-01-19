@@ -2,6 +2,7 @@
 
 namespace App\DDD\Backoffice\Shared\Infrastructure\Bus;
 
+use App\DDD\Backoffice\Shared\Domain\Bus\CommandBusInterface;
 use Exception;
 
 final readonly class SimpleCommandBus implements CommandBusInterface
@@ -24,5 +25,10 @@ final readonly class SimpleCommandBus implements CommandBusInterface
 
         // Llama al handler correspondiente pasando el command
         return ($this->handlers[$commandClass])($command);
+    }
+
+    public function map(array $map): void
+    {
+        // TODO: Implement map() method.
     }
 }
