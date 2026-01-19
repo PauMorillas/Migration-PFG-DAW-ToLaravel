@@ -19,6 +19,7 @@ class BookingServiceProvider extends AbstractDDDServiceProvider
 {
     protected function mapCommands(): void
     {
+        // TODO: ESTO DEBERÍA SER obteniendo el commandBus y haciendo ::map
         Bus::map([
             CreatePreBookingCommand::class => CreatePreBookingHandler::class,
             SendConfirmationMailCommand::class => SendConfirmationMailHandler::class,
