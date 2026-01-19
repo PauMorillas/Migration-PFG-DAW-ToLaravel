@@ -5,6 +5,7 @@ namespace App\DDD\Infrastructure\EntryPoints\Http\API\Booking;
 use App\DDD\Backoffice\Booking\Application\Command\CreatePreBookingCommand;
 use App\DDD\Backoffice\Booking\Domain\Command\SendConfirmationMailCommand;
 use App\DDD\Backoffice\Shared\Domain\Bus\AsyncCommandBusInterface;
+use App\DDD\Backoffice\Shared\Domain\Bus\SyncCommandBusInterface;
 use App\DDD\Backoffice\Shared\Infrastructure\Bus\CommandBusInterface;
 use App\DDD\Backoffice\User\Domain\Service\UserAuthService;
 use App\DTO\Booking\BookingRequestDTO;
@@ -21,7 +22,7 @@ use Throwable;
 class PostControllerWithBus
 {
 
-    Use ApiResponseTrait;
+    use ApiResponseTrait;
 
     private const PREBOOKING_ATTRIBUTES = [
         'start_date' => 'fecha de inicio',
@@ -32,13 +33,14 @@ class PostControllerWithBus
         'user_pass' => 'contraseña',
     ];
 
-    public function __construct()
+    public function __construct(
+        private SyncCommandBusInterface $commandBus
+    )
     {
-
     }
 
-    public function __invoke(int $businessId,
-                             int $serviceId,
+    public function __invoke(int     $businessId,
+                             int     $serviceId,
                              Request $request): JsonResponse
     {
         try {
@@ -61,9 +63,10 @@ class PostControllerWithBus
                 $authUser->isCliente(),
             );
 
+            /*$bus = app(CommandBusInterface::class);
+            $response = $bus->dispatch($command);*/
 
-            $bus = app(CommandBusInterface::class);
-            $response = $bus->dispatch($command);
+            $response = $this->commandBus->dispatch($command);
 
             return $this->created($response);
         } catch (ValidationException $th) {

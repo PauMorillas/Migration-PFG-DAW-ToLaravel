@@ -8,7 +8,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 readonly class LaravelSyncCommandBus implements SyncCommandBusInterface
 {
     public function __construct(
-        private  Dispatcher $bus,
+        private Dispatcher $bus,
     )
     {
     }

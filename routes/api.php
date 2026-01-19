@@ -2,7 +2,7 @@
 
 use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\PostController as PreBookingPostController;
 use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\PostControllerWithBus as PreBookingPostControllerWithBus;
-use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\GetController as PreBookingGetController;
+use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\GetBookingController as PreBookingGetController;
 use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\DeleteController as PreBookingDeleteControllerWithBus;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;

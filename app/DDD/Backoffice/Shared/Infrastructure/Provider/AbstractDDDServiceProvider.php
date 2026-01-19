@@ -24,10 +24,6 @@ abstract class AbstractDDDServiceProvider
         return $this->app;
     }
 
-    protected function getServicesContainer(): Application {
-        return $this->app;
-    }
-
     protected function getCommandBus(): CommandBusInterface {
         return $this->app->get(CommandBusInterface::class);
     }

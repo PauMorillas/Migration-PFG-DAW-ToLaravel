@@ -12,8 +12,10 @@ use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingToken;
 use App\DDD\Backoffice\Business\Domain\ValueObject\BusinessId;
 use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
 use App\DDD\Backoffice\Shared\Domain\Bus\AsyncCommandBusInterface;
+use App\DDD\Backoffice\Shared\Domain\Bus\SyncCommandBusInterface;
 use App\DDD\Backoffice\Shared\Domain\Entity\Mail\MailMessage;
 use App\DDD\Backoffice\Shared\Domain\Mail\MailerServiceInterface;
+use App\DDD\Backoffice\Shared\Infrastructure\Bus\CommandBusInterface;
 use App\DDD\Backoffice\Shared\ValueObject\Email;
 use App\DDD\Backoffice\Shared\ValueObject\Password;
 use App\DDD\Backoffice\Shared\ValueObject\SpanishPhoneNumber;
@@ -40,8 +42,10 @@ final readonly class PreBookingServiceV2
         private ServiceService                  $serviceService,
         private BusinessService                 $businessService,
         private MailerServiceInterface          $mailerService,
+        private SyncCommandBusInterface             $commandBus,
     )
-    {}
+    {
+    }
 
     public function create(BusinessId $businessId, BookingRequestDTO $bookingRequestDTO,
                            AuthUserId $authUserId, bool $includeUser): BookingResponseDTO
@@ -66,12 +70,12 @@ final readonly class PreBookingServiceV2
             'end_date' => $preBooking->getEndDate()->value(),
         ];
 
-        /*$this->sendConfirmationMail($preBooking->getUserEmail()->value(), $data);*/
-        $handler = new SendConfirmationMailHandler($this->mailerService);
+        /* $this->sendConfirmationMail($preBooking->getUserEmail()->value(), $data); */
+        /* $handler = new SendConfirmationMailHandler($this->mailerService); */
         $command = SendConfirmationMailCommand::createFromValueObjects
         ($preBooking->getUserEmail(), $data);
 
-        $handler($command);
+        $this->commandBus->dispatch($command);
 
         return BookingResponseDTO::createFromDDDPreBookingModel($preBooking, $includeUser);
     }

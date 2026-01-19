@@ -8,7 +8,7 @@ use App\DTO\Booking\BookingRequestDTO;
 use App\DTO\Booking\BookingResponseDTO;
 use App\Services\PreBookingService;
 
-readonly class CreatePreBookingHandler
+final readonly class CreatePreBookingHandler
 {
     public function __construct(
         private PreBookingServiceV2 $preBookingService
