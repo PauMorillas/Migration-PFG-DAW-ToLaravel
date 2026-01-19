@@ -12,12 +12,6 @@ final readonly class SendConfirmationMailCommand
         public array $data
     ) {}
 
-    // TODO: ESTO NO ES CORRECTO
-    public function __invoke(SendConfirmationMailHandler $handler): void
-    {
-        $handler($this);
-    }
-
     public static function createFromValueObjects(Email $email, array $data): self {
         return new self(
             $email,

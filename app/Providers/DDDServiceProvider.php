@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\DDD\Backoffice\Booking\Application\Command\CreatePreBookingCommand;
 use App\DDD\Backoffice\Booking\Application\Handler\CreatePreBookingHandler;
+use App\DDD\Backoffice\Booking\Domain\Command\SendConfirmationMailCommand;
 use App\DDD\Backoffice\Booking\Domain\Handler\SendConfirmationMailHandler;
 use App\DDD\Backoffice\Shared\Domain\Bus\AsyncCommandBusInterface;
 use App\DDD\Backoffice\Shared\Domain\Bus\SyncCommandBusInterface;
@@ -47,6 +48,7 @@ final class DDDServiceProvider extends ServiceProvider
     {
         Bus::map([
             CreatePreBookingCommand::class => CreatePreBookingHandler::class,
+            SendConfirmationMailCommand::class => SendConfirmationMailHandler::class,
         ]);
     }
 }
