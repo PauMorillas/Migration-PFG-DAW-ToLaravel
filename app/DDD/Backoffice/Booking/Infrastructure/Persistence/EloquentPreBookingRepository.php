@@ -48,11 +48,13 @@ final readonly class EloquentPreBookingRepository implements PreBookingRepositor
         return null;
     }
 
-    public function findAll(BusinessId $businessId): array
+    public function findAllByBusinessId(BusinessId $businessId): array
     {
         return DB::table('pre_bookings')
             ->join('services', 'services.id', '=', 'pre_bookings.service_id')
             ->where('services.business_id', $businessId)
+            ->where('pre_bookings.expiration_date', '>', now())
+            ->whereNull('pre_bookings.deleted_at')
             ->select('pre_bookings.*')
             ->get()
             ->map(function (object $row) {

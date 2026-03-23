@@ -36,6 +36,21 @@ class BookingRepository implements BookingRepositoryInterface
             ->get();
     }
 
+    public function findAllByBusinessIdAndStatus(int $businessId, ?BookingStatus $bookingStatus = BookingStatus::ACTIVA): Collection
+    {
+        $query = Booking::with(['user', 'service'])
+            ->whereHas('service', function ($query) use ($businessId) {
+                $query->where('business_id', $businessId);
+            });
+
+        // Si se solicita un estado específico, filtramos
+        if ($bookingStatus !== null) {
+            $query->where('status', '=', $bookingStatus->value);
+        }
+
+        return $query->get();
+    }
+
     public function findById(int $bookingId): ?Booking
     {
         return Booking::query()->find($bookingId);
@@ -70,7 +85,7 @@ class BookingRepository implements BookingRepositoryInterface
             ->where('end_date', '>', $startDate)
             ->where('status', '=', $status->value)
             // No contaremos las que fueron eliminadas
-            ->where('deleted_at', '=', null);
+            ->whereNull('deleted_at');
 
         if ($ignoreBookingId !== null) {
             $query->where('id', '!=', $ignoreBookingId);

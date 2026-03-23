@@ -23,6 +23,8 @@ interface BookingRepositoryInterface
      * */
     public function findAllByBusinessId(int $businessId): Collection;
 
+    public function findAllByBusinessIdAndStatus(int $businessId): Collection;
+
     public function create(array $data): Booking;
 
     public function updateBookingStatus(Booking $booking, array $data): Booking;

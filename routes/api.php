@@ -4,6 +4,7 @@ use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\PostController as PreBoo
 use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\PostControllerWithBus as PreBookingPostControllerWithBus;
 use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\GetBookingController as PreBookingGetController;
 use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\DeleteController as PreBookingDeleteControllerWithBus;
+use App\DDD\Infrastructure\EntryPoints\Http\API\Calendar\GetCalendarController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ServiceController;
@@ -15,6 +16,13 @@ use App\Http\Controllers\BookingController;
 Route::prefix('users')->group(function () {
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
+});
+
+// === Rutas Públicas de Lectura (Calendario Widget) ===
+Route::prefix('calendar')->group(function () {
+    // Devuelve tanto la configuración del negocio como las reservas ocupadas
+    Route::get('{serviceId}', GetCalendarController::class)
+        ->whereNumber('serviceId');
 });
 
 // ====== Rutas de lectura pública - Negocios y Service ======
