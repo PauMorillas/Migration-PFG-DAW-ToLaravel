@@ -33,6 +33,22 @@ readonly class BookingService
         return BookingResponseDTO::createFromBookingModel($booking, $includeUser);
     }
 
+    public function findByIdWithRelations(int $businessId, int $serviceId,
+                             int $bookingId, bool $includeUser): BookingResponseDTO
+    {
+        $this->assertExists($bookingId);
+
+        $this->serviceService->findById($businessId, $serviceId);
+
+        $booking = $includeUser
+            ? $this->getBookingModelWithRelations($bookingId)
+            : $this->getBookingModelOrFail($bookingId);
+
+        $this->assertBookingBelongsToService($booking, $serviceId);
+
+        return BookingResponseDTO::createFromBookingModel($booking, $includeUser);
+    }
+
     public function findAllByBusinessId(int $businessId, int $serviceId, bool $includeUser): array
     {
         $this->serviceService->findById($businessId, $serviceId);
@@ -87,6 +103,17 @@ readonly class BookingService
     private function getBookingModelWithUserOrFail(int $bookingId): ?Booking
     {
         $booking = $this->bookingRepository->findByIdWithUser($bookingId);
+
+        if (is_null($booking)) {
+            throw new BookingNotFoundException();
+        }
+
+        return $booking;
+    }
+
+    private function getBookingModelWithRelations(int $bookingId): ?Booking
+    {
+        $booking = $this->bookingRepository->findByIdWithRelations($bookingId);
 
         if (is_null($booking)) {
             throw new BookingNotFoundException();

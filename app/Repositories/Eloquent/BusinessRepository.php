@@ -3,12 +3,19 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Business;
 use App\Repositories\Contracts\BusinessRepositoryInterface;
+use Illuminate\Support\Collection;
 
 class BusinessRepository implements BusinessRepositoryInterface
 {
     public function findById($id): ?Business
     {
         return Business::query()->find($id);
+    }
+
+    public function findAllByUserId(int $userId): ?Collection {
+        return Business::query()
+            ->where('user_id', $userId)
+            ->get();
     }
 
     public function create($data): Business

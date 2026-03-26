@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Middleware\HandleCors;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,15 +17,28 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Excluimos las rutas públicas de la protección CSRF
+        $middleware->validateCsrfTokens(except: [
+            'api/public/users/register',
+            'api/public/users/login',
+        ]);
+
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+
         $middleware->alias([
             'auth.optional' => OptionalSanctumAuth::class,
         ]);
+
+
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+
+        // Esto le dice a Laravel que las rutas de 'api.php' pueden recibir
+        // cookies de sesión de los dominios definidos en SANCTUM_STATEFUL_DOMAINS
+        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
 

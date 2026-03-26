@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -29,6 +30,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $casts = [
+        'role' => UserRole::class,
+    ];
+
     protected function casts(): array
     {
         return [
@@ -40,11 +45,11 @@ class User extends Authenticatable
 
     public function isGerente(): bool
     {
-        return $this->role === 'GERENTE';
+        return $this->role->value === 'GERENTE';
     }
 
     public function isCliente(): ?bool
     {
-        return $this->role === 'CLIENTE';
+        return $this->role->value() === 'CLIENTE';
     }
 }

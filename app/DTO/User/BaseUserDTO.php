@@ -2,6 +2,7 @@
 
 namespace App\DTO\User;
 
+use App\Enums\UserRole;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 
@@ -10,7 +11,7 @@ class BaseUserDTO implements Arrayable, JsonSerializable
     public function __construct(
         protected string $name,
         protected string $email,
-        protected string $role,
+        protected UserRole $role = UserRole::CLIENTE,
         protected ?string $telephone,
     )
     {}

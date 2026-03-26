@@ -4,6 +4,7 @@ namespace App\DTO\User;
 
 use App\DDD\Backoffice\Shared\ValueObject\SpanishPhoneNumber;
 use App\DDD\Backoffice\Shared\ValueObject\Text;
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
@@ -14,7 +15,8 @@ readonly class UserResponseDTO implements Arrayable, JsonSerializable
     public function __construct(public ?int     $id,
                                 private string  $name,
                                 private string  $email,
-                                private ?string $telephone = null)
+                                private ?string $telephone = null,
+                                private UserRole $role = UserRole::CLIENTE)
     {
 
     }
@@ -26,6 +28,7 @@ readonly class UserResponseDTO implements Arrayable, JsonSerializable
             name: $user->name,
             email: $user->email,
             telephone: $user->telephone,
+            role: $user->role,
         );
     }
 
@@ -37,6 +40,7 @@ readonly class UserResponseDTO implements Arrayable, JsonSerializable
             name: $row->user_name,
             email: $row->user_email,
             telephone: $row->user_phone,
+            role: $row->user_role,
         );
     }
 
@@ -76,6 +80,7 @@ readonly class UserResponseDTO implements Arrayable, JsonSerializable
             'name' => $this->name,
             'email' => $this->email,
             'telephone' => $this->telephone,
+            'role' => $this->role,
         ];
     }
 

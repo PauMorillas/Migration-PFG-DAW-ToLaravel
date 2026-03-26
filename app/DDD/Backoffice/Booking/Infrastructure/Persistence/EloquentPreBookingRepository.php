@@ -9,6 +9,7 @@ use App\DDD\Backoffice\Booking\Domain\ValueObject\BookingId;
 use App\DDD\Backoffice\Business\Domain\ValueObject\BusinessId;
 use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -48,11 +49,11 @@ final readonly class EloquentPreBookingRepository implements PreBookingRepositor
         return null;
     }
 
-    public function findAllByBusinessId(BusinessId $businessId): array
+    public function findAllByBusinessId(BusinessId $businessId): Collection
     {
         return DB::table('pre_bookings')
             ->join('services', 'services.id', '=', 'pre_bookings.service_id')
-            ->where('services.business_id', $businessId)
+            ->where('services.business_id', $businessId->value())
             ->where('pre_bookings.expiration_date', '>', now())
             ->whereNull('pre_bookings.deleted_at')
             ->select('pre_bookings.*')
@@ -61,8 +62,7 @@ final readonly class EloquentPreBookingRepository implements PreBookingRepositor
                 return PreBooking::fromEloquentModel(
                     $this->hydrateModel($row)
                 );
-            })
-            ->all();
+            });
     }
 
     public function create(PreBooking $preBooking): PreBooking

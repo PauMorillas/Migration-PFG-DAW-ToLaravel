@@ -14,6 +14,7 @@ readonly class BusinessResponse implements Arrayable, JsonSerializable
                                 public string $phone,
                                 public string $open_hours,
                                 public string $close_hours,
+                                public string $open_days,
                                 public int $user_id)
     {
     }
@@ -27,6 +28,7 @@ readonly class BusinessResponse implements Arrayable, JsonSerializable
             phone: $business->phone,
             open_hours: $business->open_hours,
             close_hours: $business->close_hours,
+            open_days: $business->open_days,
             user_id: $business->user_id
         );
     }
@@ -40,6 +42,7 @@ readonly class BusinessResponse implements Arrayable, JsonSerializable
             'phone' => $this->phone,
             'open_hours' => $this->open_hours,
             'close_hours' => $this->close_hours,
+            'open_days' => $this->open_days,
             'user_id' => $this->user_id,
         ];
     }

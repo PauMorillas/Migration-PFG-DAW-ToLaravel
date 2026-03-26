@@ -61,6 +61,13 @@ class BookingRepository implements BookingRepositoryInterface
         return Booking::query()->with('user')->find($bookingId);
     }
 
+    public function findByIdWithRelations(int $bookingId): ?Booking
+    {
+        return Booking::query()
+            ->with(['user', 'service'])
+            ->find($bookingId);
+    }
+
     public function create(array $data): Booking
     {
         return Booking::query()->create($data);

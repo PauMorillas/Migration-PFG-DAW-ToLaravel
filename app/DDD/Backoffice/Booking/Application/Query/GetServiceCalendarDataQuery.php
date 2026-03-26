@@ -4,7 +4,7 @@ namespace App\DDD\Backoffice\Booking\Application\Query;
 
 use App\DDD\Backoffice\Service\Domain\ValueObject\ServiceId;
 
-class GetCalendarDataQuery
+class GetServiceCalendarDataQuery
 {
     private function __construct(
         public ServiceId $serviceId

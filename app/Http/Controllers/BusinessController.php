@@ -23,13 +23,29 @@ class BusinessController extends Controller
     {
     }
 
+    public function getMyBusinesses(Request $request): JsonResponse
+    {
+        try {
+            $userId = $request->user()->id;
+
+            $businesses = $this->businessService->findAllByUserId($userId);
+
+            return $this->ok($businesses);
+        } catch (AppException $th) {
+            return $this->error($th->getMessage(), $th->getStatusCode());
+        } catch (Throwable $th) {
+            return $this->internalError($th);
+        }
+    }
+
     public function findById(int $businessId): JsonResponse
     {
         try {
             $businessResp = $this->businessService->findById($businessId);
 
             return $this->ok($businessResp);
-        } catch (AppException $th) {
+        }
+        catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
             return $this->internalError($th);

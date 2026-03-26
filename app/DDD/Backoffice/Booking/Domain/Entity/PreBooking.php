@@ -21,36 +21,34 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
 {
 
     protected function __construct(
-        private ServiceId          $serviceId,
-        private AuthUserId         $authUserId,
-
-        private BookingDate        $startDate,
-        private BookingDate        $endDate,
-
-        private Text               $userName,
+        private ServiceId           $serviceId,
+        private ?AuthUserId         $authUserId,
+        private BookingDate         $startDate,
+        private BookingDate         $endDate,
+        private Text                $userName,
         private Email               $userEmail,
-        private Password           $userPass,
-        private BookingToken       $bookingToken,
-        private BookingDate        $expirationDate,
-        private ?BookingId         $id = null,
-        private ?Uuid              $uuid = null,
+        private Password            $userPass,
+        private BookingToken        $bookingToken,
+        private BookingDate         $expirationDate,
+        private ?BookingId          $id = null,
+        private ?Uuid               $uuid = null,
         private ?SpanishPhoneNumber $userPhone = null,
     )
     {
     }
 
     public static function create(
-        ServiceId          $serviceId,
-        AuthUserId         $authUserId,
-        BookingDate        $startDate,
-        BookingDate        $endDate,
-        Text               $userName,
+        ServiceId           $serviceId,
+        ?AuthUserId         $authUserId,
+        BookingDate         $startDate,
+        BookingDate         $endDate,
+        Text                $userName,
         Email               $userEmail,
-        Password           $userPass,
-        BookingToken       $bookingToken,
-        BookingDate        $expirationDate,
-        ?BookingId         $id = null,
-        ?Uuid              $uuid = null,
+        Password            $userPass,
+        BookingToken        $bookingToken,
+        BookingDate         $expirationDate,
+        ?BookingId          $id = null,
+        ?Uuid               $uuid = null,
         ?SpanishPhoneNumber $userPhone = null,
     ): self
     {
@@ -76,7 +74,7 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
 
         return new self(
             serviceId: ServiceId::createFromInt($model->service_id),
-            authUserId: AuthUserId::createFromInt($model->user_id),
+            authUserId: $model->user_id !== null ? AuthUserId::createFromInt($model->user_id) : null,
             startDate: BookingDate::createFromString($model->start_date, $checkIfDateIsOnPast),
             endDate: BookingDate::createFromString($model->end_date, $checkIfDateIsOnPast),
             userName: Text::createFromString($model->user_name),
@@ -148,7 +146,7 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
         $model->id = $exists ? $this->id?->value() : null;
         $model->uuid = $this->uuid?->value();
         $model->service_id = $this->serviceId->value();
-        $model->user_id = $this->authUserId->value();
+        $model->user_id = $this->authUserId?->value(); // nullsafe operator para user_id
         $model->start_date = $this->startDate->value();
         $model->end_date = $this->endDate->value();
         $model->token = $this->bookingToken->value();
@@ -215,7 +213,7 @@ final readonly class PreBooking implements Arrayable, JsonSerializable
             'uuid' => $this->uuid ? $this->uuid->value() : null,
             'id' => $this->id ? $this->id->value() : null,
             'service_id' => $this->serviceId->value(),
-            'user_id' => $this->authUserId->value(),
+            'user_id' => $this->authUserId ? $this->authUserId->value() : null, // Comprobación de nulo para user_id
             'start_date' => $this->startDate->value(),
             'end_date' => $this->endDate->value(),
             'token' => $this->bookingToken->value(),

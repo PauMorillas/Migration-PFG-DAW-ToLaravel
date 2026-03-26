@@ -31,6 +31,22 @@ readonly class BookingDTO implements Arrayable, JsonSerializable
         );
     }
 
+    public static function createForStatusUpdate(
+        int $bookingId,
+        int $serviceId,
+        BookingStatus $status,
+        int $userId
+    ): self {
+        return new self(
+            bookingId: $bookingId,
+            serviceId: $serviceId,
+            userId: $userId,
+            startDate: '',
+            endDate: '',
+            status: $status
+        );
+    }
+
     public function toArray(): array
     {
         return [

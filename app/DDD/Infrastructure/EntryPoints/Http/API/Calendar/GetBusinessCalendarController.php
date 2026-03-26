@@ -2,35 +2,35 @@
 
 namespace App\DDD\Infrastructure\EntryPoints\Http\API\Calendar;
 
-use App\DDD\Backoffice\Booking\Application\Handler\GetCalendarDataHandler;
-use App\DDD\Backoffice\Booking\Application\Query\GetCalendarDataQuery;
+use App\DDD\Backoffice\Booking\Application\Handler\GetBusinessCalendarDataHandler;
+use App\DDD\Backoffice\Booking\Application\Query\GetBusinessCalendarDataQuery;
 use App\Exceptions\AppException;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 
-class GetCalendarController
+class GetBusinessCalendarController
 {
     use ApiResponseTrait;
 
     public function __construct(
-        private readonly GetCalendarDataHandler $handler
-    ) {}
+        private GetBusinessCalendarDataHandler $handler)
+    {
 
-    public function __invoke(int $serviceId): JsonResponse
+    }
+
+    public function __invoke(int $businessId): JsonResponse
     {
         try {
-            $query = GetCalendarDataQuery::createFromInt($serviceId);
+            $query = GetBusinessCalendarDataQuery::createFromInt($businessId);
 
             $response = ($this->handler)($query);
 
-            return $this->ok($responseDto->toArray());
+            return $this->ok($response->toArray());
 
         } catch (AppException $th) {
-            // Excepciones controladas de dominio
             return $this->error($th->getMessage(), $th->getStatusCode());
         } catch (Throwable $th) {
-            // Excepciones no controladas
             return $this->internalError($th);
         }
     }

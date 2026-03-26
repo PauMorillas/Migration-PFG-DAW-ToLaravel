@@ -102,4 +102,19 @@ readonly class BusinessService
             throw new UnauthorizedException();
         }
     }
+
+    /**
+     * Devuelve un array de BusinessResponse DTOs
+     */
+    public function findAllByUserId(int $userId): array
+    {
+
+        $this->userService->assertExists($userId);
+
+        $businesses = $this->businessRepository->findAllByUserId($userId);
+
+        return $businesses->map(function (Business $business) {
+            return BusinessResponse::createFromModel($business);
+        })->toArray();
+    }
 }

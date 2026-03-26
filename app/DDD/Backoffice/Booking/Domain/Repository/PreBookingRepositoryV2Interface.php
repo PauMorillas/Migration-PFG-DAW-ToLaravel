@@ -14,7 +14,7 @@ interface PreBookingRepositoryV2Interface
     // TODO: En principio solo necesitaré estas funciones
     public function findById(BookingId $bookingId): ?PreBooking;
     /** @return PreBooking[] */
-    public function findAllByBusinessId(BusinessId $businessId): array;
+    public function findAllByBusinessId(BusinessId $businessId): Collection;
     public function create(PreBooking $preBooking): PreBooking;
     public function delete(PreBooking $preBooking): void;
     public function findByToken(string $token): ?PreBooking;

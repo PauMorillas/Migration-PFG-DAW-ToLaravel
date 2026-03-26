@@ -52,10 +52,15 @@ class BookingController extends Controller
     public function findById(int $businessId, int $serviceId, int $bookingId, Request $request): JsonResponse
     {
         try {
-            $user = $request->user(); // null si no hay token
-            $isGerente = $user?->isGerente() ?? false;
+            $user = $request->user();
+            $includeUserDetails = $user?->isGerente() ?? false;
 
-            $bookingResp = $this->bookingService->findById($businessId, $serviceId, $bookingId, $isGerente);
+            $bookingResp = $this->bookingService->findByIdWithRelations(
+                $businessId,
+                $serviceId,
+                $bookingId,
+                $includeUserDetails
+            );
             return $this->ok($bookingResp);
         } catch (AppException $th) {
             return $this->error($th->getMessage(), $th->getStatusCode());
@@ -97,14 +102,17 @@ class BookingController extends Controller
             $this->validateBookings($request, [
                 'status' => ['required', new Enum(BookingStatus::class)],
             ], self::BOOKING_UPDATE_ATTRIBUTES);
-            $status = BookingStatus::from($request->get('status'));
-
+            $status = BookingStatus::from($request->input('status'));
             $user = $request->user();
-            $isGerente = $user?->isGerente() ?? false;
-            $userId = $request->user()->id;
 
-            $bookingDTO = BookingDTO::createFromArray($request->all(),
-                $serviceId, $status, $bookingId, $userId);
+            $isGerente = $user?->isGerente() ?? false;
+
+            $bookingDTO = BookingDTO::createForStatusUpdate(
+                $bookingId,
+                $serviceId,
+                $status,
+                $user->id
+            );
 
             $bookingResp = $this->bookingService->updateBookingStatus($bookingDTO, $businessId, $isGerente);
 

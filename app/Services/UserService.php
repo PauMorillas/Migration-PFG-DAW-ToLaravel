@@ -11,6 +11,7 @@ use App\Exceptions\UnauthorizedException;
 use App\Exceptions\UserNotFoundException;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 readonly class UserService
@@ -47,20 +48,21 @@ readonly class UserService
     }*/
     public function login(UserLoginRequest $dto): array
     {
-        $user = $this->userRepository->findByEmail(
-            $dto->getEmail());
+        $credentials = [
+            'email' => $dto->getEmail(),
+            'password' => $dto->getPassword(),
+        ];
 
-        if (is_null($user)) {
+        if (!Auth::attempt($credentials)) {
             throw new UserNotFoundException();
         }
 
-        if (!Hash::check($dto->getPassword(), $user->password)) {
-            throw new InvalidCredentialsException();
-        }
+        request()->session()->regenerate();
+
+        $user = Auth::user();
 
         return [
             'user' => UserResponseDTO::createFromModel($user),
-            'token' => $user->createToken('api-token')->plainTextToken,
         ];
     }
 
@@ -108,7 +110,7 @@ readonly class UserService
     {
         $exists = $this->userRepository->assertExists($userId);
 
-        if (is_null($exists) | !$exists) {
+        if (is_null($exists) || !$exists) {
             throw new UserNotFoundException();
         }
 

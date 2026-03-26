@@ -4,7 +4,8 @@ use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\PostController as PreBoo
 use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\PostControllerWithBus as PreBookingPostControllerWithBus;
 use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\GetBookingController as PreBookingGetController;
 use App\DDD\Infrastructure\EntryPoints\Http\API\Booking\DeleteController as PreBookingDeleteControllerWithBus;
-use App\DDD\Infrastructure\EntryPoints\Http\API\Calendar\GetCalendarController;
+use App\DDD\Infrastructure\EntryPoints\Http\API\Calendar\GetBusinessCalendarController;
+use App\DDD\Infrastructure\EntryPoints\Http\API\Calendar\GetServiceCalendarController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ServiceController;
@@ -12,34 +13,35 @@ use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\PreBookingController;
 use App\Http\Controllers\BookingController;
 
-// === Rutas del Usuario Públicas (SIN AUTH) ===
-Route::prefix('users')->group(function () {
-    Route::post('/register', [UserController::class, 'register']);
-    Route::post('/login', [UserController::class, 'login']);
+Route::prefix('public')->group(function () {
+
+    // === Rutas del Usuario Públicas ===
+    Route::prefix('users')->group(function () {
+        Route::post('/register', [UserController::class, 'register']);
+        Route::post('/login', [UserController::class, 'login']);
+    });
+
+    // === Rutas de Lectura del Widget del Calendario ===
+    Route::prefix('calendar')->group(function () {
+        // Devuelve tanto la configuración del negocio como las reservas ocupadas
+        Route::get('{serviceId}', GetServiceCalendarController::class)
+            ->whereNumber('serviceId');
+        Route::get('/businesses/{businessId}' , GetBusinessCalendarController::class)
+            ->whereNumber('businessId');
+    });
+
+    // Negocios y Servicios (Solo lectura)
+    Route::prefix('businesses')->group(function () {
+        Route::get('/{businessId}', [BusinessController::class, 'findById'])->whereNumber('businessId');
+        // === Rutas de Services (1-N Desde negocio) ===
+        Route::get('{businessId}/services', [ServiceController::class, 'findAll'])->whereNumber('businessId');
+        Route::get('{businessId}/services/{serviceId}', [ServiceController::class, 'findById'])->whereNumber('businessId');
+    });
 });
 
-// === Rutas Públicas de Lectura (Calendario Widget) ===
-Route::prefix('calendar')->group(function () {
-    // Devuelve tanto la configuración del negocio como las reservas ocupadas
-    Route::get('{serviceId}', GetCalendarController::class)
-        ->whereNumber('serviceId');
-});
-
-// ====== Rutas de lectura pública - Negocios y Service ======
-// ==== Rutas para la entidad Business ====
-Route::prefix('businesses')->group(function () {
-    Route::get('/{businessId}', [BusinessController::class, 'findById'])
-        ->whereNumber('businessId'); // TODO: Preguntar si esta validación debe ir aquí
-
-    // === Rutas de Services (1-N Desde negocio) ===
-    Route::get('{businessId}/services', [ServiceController::class, 'findAll'])
-        ->whereNumber('businessId');
-    Route::get('{businessId}/services/{serviceId}', [ServiceController::class, 'findById'])
-        ->whereNumber('businessId');
-
-    // === Rutas con Autorización Opcional ===
-    Route::middleware('auth.optional')->group(function () {
-
+// === Rutas con Autorización Opcional ===
+Route::middleware('auth.optional')->group(function () {
+    Route::prefix('businesses')->group(function () {
         // === Rutas de PreBooking (1-N desde Servicio) ===
         Route::get('{businessId}/services/{serviceId}/bookings', [PreBookingController::class, 'findAll'])
             ->whereNumber(['businessId', 'serviceId']);
@@ -75,6 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('businesses')->group(function () {
+        Route::get('/', [BusinessController::class, 'getMyBusinesses']);
         Route::post('/', [BusinessController::class, 'create']);
 
         Route::put('{businessId}', [BusinessController::class, 'update'])
